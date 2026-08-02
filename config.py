@@ -89,34 +89,17 @@ class Config:
 
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024
 
-    MAIL_SERVER = os.getenv(
-        "MAIL_SERVER",
-        "smtp.gmail.com",
+    BREVO_API_KEY = os.getenv(
+        "BREVO_API_KEY"
     )
 
-    MAIL_PORT = int(
-        os.getenv(
-            "MAIL_PORT",
-            "587",
-        )
+    BREVO_SENDER_EMAIL = os.getenv(
+        "BREVO_SENDER_EMAIL"
     )
 
-    MAIL_USE_TLS = get_boolean_environment_value(
-        "MAIL_USE_TLS",
-        True,
-    )
-
-    MAIL_USE_SSL = get_boolean_environment_value(
-        "MAIL_USE_SSL",
-        False,
-    )
-
-    MAIL_USERNAME = os.getenv("MAIL_USERNAME")
-
-    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
-
-    MAIL_DEFAULT_SENDER = (
-        os.getenv("MAIL_DEFAULT_SENDER") or MAIL_USERNAME
+    BREVO_SENDER_NAME = os.getenv(
+        "BREVO_SENDER_NAME",
+        "PhishGuard",
     )
 
     PASSWORD_RESET_MAX_AGE = int(
