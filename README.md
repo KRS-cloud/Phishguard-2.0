@@ -15,9 +15,7 @@ analysis platform.
 - User authentication
 - Personal scan history
 
-## Current Progress
 
-Phase 1: Project foundation and base interface.
 
 ## Run Locally
 
