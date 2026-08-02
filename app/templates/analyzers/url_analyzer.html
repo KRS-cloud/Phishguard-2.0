@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}
+    URL Analyzer | PhishGuard AI & ML
+{% endblock %}
+
+{% block content %}
+<section class="analyzer-section">
+    <div class="container">
+        <div class="analyzer-heading">
+            <span class="eyebrow">
+                AI & ML Security Tool
+            </span>
+
+            <h1>
+                URL Phishing Analyzer
+            </h1>
+
+            <p>
+                Enter a website address to inspect its structure,
+                detect phishing indicators and receive a detailed
+                security report.
+            </p>
+        </div>
+
+        <div class="analyzer-layout">
+            <section class="analyzer-card">
+                <div class="analyzer-card-heading">
+                    <h2>Analyze a Website</h2>
+
+                    <p>
+                        You may enter a complete URL or only a domain.
+                    </p>
+                </div>
+
+                <form
+                    class="analyzer-form"
+                    method="POST"
+                    action="{{ url_for('analyzer.url_analyzer') }}"
+                >
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <label for="url">
+                            Website URL
+                        </label>
+
+                        <input
+                            id="url"
+                            name="url"
+                            type="text"
+                            value="{{ submitted_url }}"
+                            placeholder="https://example.com"
+                            maxlength="2048"
+                            autocomplete="url"
+                            required
+                        >
+
+                        <small class="form-help">
+                            Example: google.com or
+                            https://example.com/login
+                        </small>
+                    </div>
+
+                    <button
+                        class="button button-primary analyzer-submit"
+                        type="submit"
+                    >
+                        Analyze URL
+                    </button>
+                </form>
+
+                <div class="analyzer-notice">
+                    <span>🛡️</span>
+
+                    <p>
+                        PhishGuard analyzes the URL structure. A safe
+                        result cannot guarantee that all page content
+                        is trustworthy.
+                    </p>
+                </div>
+            </section>
+
+            <aside class="analysis-guide">
+                <h2>What PhishGuard Checks</h2>
+
+                <ul>
+                    <li>HTTPS connection</li>
+                    <li>Domain and subdomain structure</li>
+                    <li>Suspicious phishing words</li>
+                    <li>URL shorteners</li>
+                    <li>IP-address based links</li>
+                    <li>Encoded and hidden characters</li>
+                    <li>Unusual domain extensions</li>
+                    <li>URL length and special characters</li>
+                </ul>
+            </aside>
+        </div>
+
+        {% if result %}
+            <section class="result-section">
+                <div
+                    class="result-summary result-{{ result.risk_level | lower }}"
+                >
+                    <div>
+                        <span class="result-label">
+                            Analysis Result
+                        </span>
+
+                        <h2>
+                            {{ result.prediction }}
+                        </h2>
+
+                        <p>
+                            {{ result.normalized_url }}
+                        </p>
+                    </div>
+
+                    <div class="score-circle">
+                        <strong>
+                            {{ result.risk_score | int }}
+                        </strong>
+
+                        <span>
+                            Risk Score
+                        </span>
+                    </div>
+                </div>
+
+                <div class="result-statistics">
+                    <article>
+                        <span>Risk Level</span>
+
+                        <strong>
+                            {{ result.risk_level }}
+                        </strong>
+                    </article>
+
+                    <article>
+                        <span>Confidence</span>
+
+                        <strong>
+                            {{ result.confidence }}%
+                        </strong>
+                    </article>
+
+                    <article>
+                        <span>HTTPS</span>
+
+                        <strong>
+                            {% if result.features.uses_https %}
+                                Yes
+                            {% else %}
+                                No
+                            {% endif %}
+                        </strong>
+                    </article>
+
+                    <article>
+                        <span>URL Length</span>
+
+                        <strong>
+                            {{ result.features.url_length }}
+                        </strong>
+                    </article>
+                </div>
+
+                <section class="ml-analysis-card">
+                    <div class="ml-stat">
+                        <span>Analysis Method</span>
+                        <strong>
+                            {{ result.analysis_method }}
+                        </strong>
+                    </div>
+
+                    <div class="ml-stat">
+                        <span>Rule-Based Score</span>
+                        <strong>
+                            {{ result.rule_risk_score }}%
+                        </strong>
+                    </div>
+
+                    {% if result.ml_result %}
+                        <div class="ml-stat">
+                            <span>ML Prediction</span>
+                            <strong>
+                                {{ result.ml_result.prediction }}
+                            </strong>
+                        </div>
+
+                        <div class="ml-stat">
+                            <span>ML Safe Probability</span>
+                            <strong>
+                                {{ result.ml_result.safe_probability }}%
+                            </strong>
+                        </div>
+
+                        <div class="ml-stat">
+                            <span>ML Phishing Probability</span>
+                            <strong>
+                                {{ result.ml_result.phishing_probability }}%
+                            </strong>
+                        </div>
+
+                        <div class="ml-stat">
+                            <span>Model</span>
+                            <strong>
+                                {{ result.ml_result.model_name }}
+                            </strong>
+                        </div>
+                    {% endif %}
+                </section>
+
+                <div class="result-grid">
+                    <section class="result-card">
+                        <div class="result-card-heading">
+                            <h2>Detected Indicators</h2>
+
+                            <p>
+                                Factors that influenced the risk score.
+                            </p>
+                        </div>
+
+                        {% if result.reasons %}
+                            <div class="reason-list">
+                                {% for reason in result.reasons %}
+                                    <article class="reason-item">
+                                        <div>
+                                            <strong>
+                                                {{ reason.feature }}
+                                            </strong>
+
+                                            <p>
+                                                {{ reason.message }}
+                                            </p>
+                                        </div>
+
+                                        <span>
+                                            +{{ reason.score }}
+                                        </span>
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="positive-result">
+                                <span>✓</span>
+
+                                <p>
+                                    No major structural phishing
+                                    indicators were detected.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </section>
+
+                    <section class="result-card">
+                        <div class="result-card-heading">
+                            <h2>Safety Recommendations</h2>
+
+                            <p>
+                                Actions you should take after this result.
+                            </p>
+                        </div>
+
+                        <div class="recommendation-list">
+                            {% for recommendation in result.recommendations %}
+                                <div>
+                                    <span>✓</span>
+
+                                    <p>
+                                        {{ recommendation }}
+                                    </p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                </div>
+
+                <div class="ai-explain-section">
+                    <button
+                        type="button"
+                        class="button button-primary"
+                        id="explainScanButton"
+                        data-explain-url="{{ url_for('main.explain_scan') }}"
+                        data-assistant-url="{{ url_for('main.assistant') }}"
+                    >
+                        Explain with AI
+                    </button>
+
+                    <p class="ai-explain-note">
+                        Get a simple explanation of why PhishGuard
+                        classified this URL this way.
+                    </p>
+                </div>
+
+                <script id="scanResultData" type="application/json">
+                    {{ result | tojson }}
+                </script>
+            </section>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

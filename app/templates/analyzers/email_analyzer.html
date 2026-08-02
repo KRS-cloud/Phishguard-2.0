@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Email Analyzer | PhishGuard AI & ML
+{% endblock %}
+
+{% block content %}
+<section class="analyzer-section">
+    <div class="container">
+        <div class="analyzer-heading">
+            <span class="eyebrow">
+                Email Security Tool
+            </span>
+
+            <h1>Email Phishing Analyzer</h1>
+
+            <p>
+                Paste a suspicious email to detect urgent wording,
+                credential requests, risky links and social-engineering
+                patterns.
+            </p>
+        </div>
+
+        <div class="analyzer-layout">
+            <section class="analyzer-card">
+                <div class="analyzer-card-heading">
+                    <h2>Inspect an Email</h2>
+
+                    <p>
+                        Sender and subject are optional, but they improve
+                        the analysis.
+                    </p>
+                </div>
+
+                <form
+                    class="analyzer-form"
+                    method="POST"
+                    action="{{ url_for('analyzer.email_analyzer') }}"
+                >
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <label for="sender_email">
+                            Sender Email
+                        </label>
+
+                        <input
+                            id="sender_email"
+                            name="sender_email"
+                            type="email"
+                            value="{{ sender_email }}"
+                            placeholder="security@example.com"
+                            maxlength="200"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">
+                            Email Subject
+                        </label>
+
+                        <input
+                            id="subject"
+                            name="subject"
+                            type="text"
+                            value="{{ subject }}"
+                            placeholder="Enter the email subject"
+                            maxlength="300"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email_body">
+                            Email Content
+                        </label>
+
+                        <textarea
+                            id="email_body"
+                            name="email_body"
+                            rows="12"
+                            maxlength="20000"
+                            placeholder="Paste the complete suspicious email here..."
+                            required
+                        >{{ email_body }}</textarea>
+
+                        <small class="form-help">
+                            Never paste real passwords, OTP codes or
+                            private banking details.
+                        </small>
+                    </div>
+
+                    <button
+                        class="button button-primary analyzer-submit"
+                        type="submit"
+                    >
+                        Analyze Email
+                    </button>
+                </form>
+            </section>
+
+            <aside class="analysis-guide">
+                <h2>What PhishGuard Checks</h2>
+
+                <ul>
+                    <li>Urgent and threatening language</li>
+                    <li>Password and login requests</li>
+                    <li>OTP and verification-code requests</li>
+                    <li>Banking and payment wording</li>
+                    <li>Prize and reward scams</li>
+                    <li>Suspicious website links</li>
+                    <li>Dangerous attachment names</li>
+                    <li>Excessive capitalization</li>
+                </ul>
+            </aside>
+        </div>
+
+        {% if result %}
+            <section class="result-section">
+                <div
+                    class="result-summary result-{{ result.risk_level | lower }}"
+                >
+                    <div>
+                        <span class="result-label">
+                            Email Analysis Result
+                        </span>
+
+                        <h2>{{ result.prediction }}</h2>
+
+                        <p>
+                            The submitted email received a
+                            {{ result.risk_level | lower }} risk rating.
+                        </p>
+                    </div>
+
+                    <div class="score-circle">
+                        <strong>
+                            {{ result.risk_score | int }}
+                        </strong>
+
+                        <span>Risk Score</span>
+                    </div>
+                </div>
+
+                <div class="result-statistics">
+                    <article>
+                        <span>Risk Level</span>
+                        <strong>{{ result.risk_level }}</strong>
+                    </article>
+
+                    <article>
+                        <span>Confidence</span>
+                        <strong>{{ result.confidence }}%</strong>
+                    </article>
+
+                    <article>
+                        <span>Links Found</span>
+                        <strong>{{ result.features.url_count }}</strong>
+                    </article>
+
+                    <article>
+                        <span>Message Length</span>
+                        <strong>{{ result.features.content_length }}</strong>
+                    </article>
+                </div>
+
+                <div class="result-grid">
+                    <section class="result-card">
+                        <div class="result-card-heading">
+                            <h2>Detected Indicators</h2>
+
+                            <p>
+                                Patterns that influenced the result.
+                            </p>
+                        </div>
+
+                        {% if result.reasons %}
+                            <div class="reason-list">
+                                {% for reason in result.reasons %}
+                                    <article class="reason-item">
+                                        <div>
+                                            <strong>
+                                                {{ reason.feature }}
+                                            </strong>
+
+                                            <p>
+                                                {{ reason.message }}
+                                            </p>
+                                        </div>
+
+                                        <span>
+                                            +{{ reason.score }}
+                                        </span>
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="positive-result">
+                                <span>✓</span>
+
+                                <p>
+                                    No major phishing indicators were detected.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </section>
+
+                    <section class="result-card">
+                        <div class="result-card-heading">
+                            <h2>Safety Recommendations</h2>
+
+                            <p>
+                                Recommended actions for this message.
+                            </p>
+                        </div>
+
+                        <div class="recommendation-list">
+                            {% for recommendation in result.recommendations %}
+                                <div>
+                                    <span>✓</span>
+
+                                    <p>
+                                        {{ recommendation }}
+                                    </p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                </div>
+
+                {% if result.suspicious_links %}
+                    <section class="result-card suspicious-link-panel">
+                        <div class="result-card-heading">
+                            <h2>Suspicious Links</h2>
+
+                            <p>
+                                Links detected inside the submitted email.
+                            </p>
+                        </div>
+
+                        <div class="reason-list">
+                            {% for link in result.suspicious_links %}
+                                <article class="reason-item">
+                                    <div>
+                                        <strong>
+                                            {{ link.prediction }}
+                                        </strong>
+
+                                        <p>
+                                            {{ link.url }}
+                                        </p>
+                                    </div>
+
+                                    <span>
+                                        {{ link.risk_score | int }}/100
+                                    </span>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    </section>
+                {% endif %}
+            </section>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

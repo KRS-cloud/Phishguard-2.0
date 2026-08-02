@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Create Account | PhishGuard AI & ML
+{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="container auth-layout">
+        <div class="auth-information">
+            <span class="eyebrow">
+                Create Your Account
+            </span>
+
+            <h1>
+                Build your personal security history.
+            </h1>
+
+            <p>
+                Create an account to save future URL, email and QR
+                analysis reports securely in your personal history.
+            </p>
+
+            <div class="auth-benefits">
+                <div>
+                    <span>✓</span>
+
+                    <p>
+                        Save completed security scans.
+                    </p>
+                </div>
+
+                <div>
+                    <span>✓</span>
+
+                    <p>
+                        Review previous risk reports.
+                    </p>
+                </div>
+
+                <div>
+                    <span>✓</span>
+
+                    <p>
+                        Access personalized cybersecurity tools.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <h2>Create Account</h2>
+
+                <p>
+                    Enter your information to begin.
+                </p>
+            </div>
+
+            <form
+                class="auth-form"
+                method="POST"
+                action="{{ url_for('auth.register') }}"
+                novalidate
+            >
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="full_name">
+                        Full Name
+                    </label>
+
+                    <input
+                        id="full_name"
+                        name="full_name"
+                        type="text"
+                        value="{{ full_name | default('') }}"
+                        placeholder="Enter your full name"
+                        minlength="3"
+                        maxlength="120"
+                        autocomplete="name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value="{{ email | default('') }}"
+                        placeholder="Enter your email address"
+                        maxlength="120"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <div class="password-field">
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="Create a strong password"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            class="password-toggle"
+                            type="button"
+                            data-password-target="password"
+                        >
+                            Show
+                        </button>
+                    </div>
+
+                    <small class="form-help">
+                        Use at least 8 characters with uppercase,
+                        lowercase and a number.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">
+                        Confirm Password
+                    </label>
+
+                    <div class="password-field">
+                        <input
+                            id="confirm_password"
+                            name="confirm_password"
+                            type="password"
+                            placeholder="Enter the password again"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            class="password-toggle"
+                            type="button"
+                            data-password-target="confirm_password"
+                        >
+                            Show
+                        </button>
+                    </div>
+                </div>
+
+                <button
+                    class="button button-primary auth-submit"
+                    type="submit"
+                >
+                    Create Account
+                </button>
+            </form>
+
+            <p class="auth-switch">
+                Already have an account?
+
+                <a href="{{ url_for('auth.login') }}">
+                    Log in
+                </a>
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

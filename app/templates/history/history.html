@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Scan History | PhishGuard AI & ML
+{% endblock %}
+
+{% block content %}
+<section class="history-section">
+    <div class="container">
+        <div class="history-heading">
+            <div>
+                <span class="eyebrow">
+                    Personal Security Records
+                </span>
+
+                <h1>Scan History</h1>
+
+                <p>
+                    Review, filter and manage your previous
+                    PhishGuard security analyses.
+                </p>
+            </div>
+
+            <div class="history-header-actions" style="display: flex; gap: 0.75rem; align-items: center;">
+                <a
+                    class="button button-outline"
+                    href="{{ url_for('history.export_csv') }}"
+                >
+                    Export CSV
+                </a>
+
+                <a
+                    class="button button-primary"
+                    href="{{ url_for('analyzer.url_analyzer') }}"
+                >
+                    New URL Scan
+                </a>
+            </div>
+        </div>
+
+        <div class="history-statistics">
+            <article>
+                <span>Total Scans</span>
+                <strong>{{ total_scans }}</strong>
+            </article>
+
+            <article class="history-safe">
+                <span>Safe</span>
+                <strong>{{ safe_scans }}</strong>
+            </article>
+
+            <article class="history-suspicious">
+                <span>Suspicious</span>
+                <strong>{{ suspicious_scans }}</strong>
+            </article>
+
+            <article class="history-phishing">
+                <span>Phishing</span>
+                <strong>{{ phishing_scans }}</strong>
+            </article>
+        </div>
+
+        <section class="history-panel">
+            <form
+                class="history-filters"
+                method="GET"
+                action="{{ url_for('history.history') }}"
+            >
+                <div class="history-search">
+                    <label for="search">
+                        Search
+                    </label>
+
+                    <input
+                        id="search"
+                        name="search"
+                        type="text"
+                        value="{{ search_query }}"
+                        placeholder="Search URL or submitted content"
+                    >
+                </div>
+
+                <div>
+                    <label for="scan_type">
+                        Scan Type
+                    </label>
+
+                    <select
+                        id="scan_type"
+                        name="scan_type"
+                    >
+                        <option value="">
+                            All Types
+                        </option>
+
+                        <option
+                            value="URL"
+                            {% if selected_scan_type == "URL" %}
+                                selected
+                            {% endif %}
+                        >
+                            URL
+                        </option>
+
+                        <option
+                            value="Email"
+                            {% if selected_scan_type == "Email" %}
+                                selected
+                            {% endif %}
+                        >
+                            Email
+                        </option>
+
+                        <option
+                            value="QR"
+                            {% if selected_scan_type == "QR" %}
+                                selected
+                            {% endif %}
+                        >
+                            QR
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="prediction">
+                        Result
+                    </label>
+
+                    <select
+                        id="prediction"
+                        name="prediction"
+                    >
+                        <option value="">
+                            All Results
+                        </option>
+
+                        <option
+                            value="Safe"
+                            {% if selected_prediction == "Safe" %}
+                                selected
+                            {% endif %}
+                        >
+                            Safe
+                        </option>
+
+                        <option
+                            value="Suspicious"
+                            {% if selected_prediction == "Suspicious" %}
+                                selected
+                            {% endif %}
+                        >
+                            Suspicious
+                        </option>
+
+                        <option
+                            value="Phishing"
+                            {% if selected_prediction == "Phishing" %}
+                                selected
+                            {% endif %}
+                        >
+                            Phishing
+                        </option>
+                    </select>
+                </div>
+
+                <div class="history-filter-actions">
+                    <button
+                        class="button button-primary"
+                        type="submit"
+                    >
+                        Apply Filters
+                    </button>
+
+                    <a
+                        class="button button-outline"
+                        href="{{ url_for('history.history') }}"
+                    >
+                        Reset
+                    </a>
+                </div>
+            </form>
+
+            {% if scans %}
+                <div class="history-table-wrapper">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Submitted Input</th>
+                                <th>Result</th>
+                                <th>Risk Score</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for scan in scans %}
+                                <tr>
+                                    <td>
+                                        <span class="scan-type-badge">
+                                            {{ scan.scan_type }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="history-input-value">
+                                            {{ scan.input_value }}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            class="prediction-badge prediction-{{ scan.prediction | lower }}"
+                                        >
+                                            {{ scan.prediction }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="history-score">
+                                            <strong>
+                                                {{ scan.risk_score | int }}
+                                            </strong>
+
+                                            <span>/100</span>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        {{ scan.created_at.strftime("%d %b %Y") }}
+
+                                        <small>
+                                            {{ scan.created_at.strftime("%I:%M %p") }}
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        <div class="history-actions">
+                                            <a
+                                                class="history-view-button"
+                                                href="{{ url_for('history.scan_details', scan_id=scan.id) }}"
+                                            >
+                                                View
+                                            </a>
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for('history.delete_scan', scan_id=scan.id) }}"
+                                                onsubmit="return confirm('Delete this scan record?');"
+                                            >
+                                                <input
+                                                    type="hidden"
+                                                    name="csrf_token"
+                                                    value="{{ csrf_token() }}">
+                                                <button
+                                                    class="history-delete-button"
+                                                    type="submit"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if pagination.pages > 1 %}
+                    <nav class="pagination">
+                        {% if pagination.has_prev %}
+                            <a
+                                href="{{ url_for(
+                                    'history.history',
+                                    page=pagination.prev_num,
+                                    search=search_query,
+                                    scan_type=selected_scan_type,
+                                    prediction=selected_prediction
+                                ) }}"
+                            >
+                                Previous
+                            </a>
+                        {% endif %}
+
+                        <span>
+                            Page {{ pagination.page }}
+                            of {{ pagination.pages }}
+                        </span>
+
+                        {% if pagination.has_next %}
+                            <a
+                                href="{{ url_for(
+                                    'history.history',
+                                    page=pagination.next_num,
+                                    search=search_query,
+                                    scan_type=selected_scan_type,
+                                    prediction=selected_prediction
+                                ) }}"
+                            >
+                                Next
+                            </a>
+                        {% endif %}
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="history-empty-state">
+                    <span>📋</span>
+
+                    <h2>No matching scans found</h2>
+
+                    <p>
+                        Complete a security scan or change your filters.
+                    </p>
+
+                    <a
+                        class="button button-primary"
+                        href="{{ url_for('analyzer.url_analyzer') }}"
+                    >
+                        Analyze a URL
+                    </a>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+</section>
+{% endblock %}

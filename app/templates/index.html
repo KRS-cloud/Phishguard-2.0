@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}
+    PhishGuard AI & ML | Cybersecurity Platform
+{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container hero-layout">
+        <div class="hero-content">
+            <span class="eyebrow">
+                AI & ML Powered Cybersecurity
+            </span>
+
+            <h1>
+                Analyze suspicious content
+                <span>before it harms you.</span>
+            </h1>
+
+            <p>
+                PhishGuard combines machine learning, security rules
+                and AI-generated explanations to analyze URLs, emails,
+                QR codes and password security.
+            </p>
+
+            <div class="hero-actions">
+                <a
+                    class="button button-primary button-large"
+                    href="#tools"
+                >
+                    Explore Security Tools
+                </a>
+
+                <a
+                    class="button button-secondary button-large"
+                    href="#process"
+                >
+                    How It Works
+                </a>
+            </div>
+
+            <div class="hero-benefits">
+                <span>✓ Structured risk reports</span>
+                <span>✓ AI explanations</span>
+                <span>✓ Personal scan history</span>
+            </div>
+        </div>
+
+        <div class="analysis-preview">
+            <div class="preview-header">
+                <span>
+                    <span class="status-dot"></span>
+                    Security Analysis Preview
+                </span>
+
+                <span class="demo-label">
+                    Demo
+                </span>
+            </div>
+
+            <div class="preview-url">
+                <small>Submitted URL</small>
+                <strong>secure-login-example.com</strong>
+            </div>
+
+            <div class="preview-result">
+                <div class="risk-score">
+                    <strong>82</strong>
+                    <small>Risk Score</small>
+                </div>
+
+                <div>
+                    <span class="high-risk">
+                        High Risk
+                    </span>
+
+                    <h3>
+                        Suspicious indicators detected
+                    </h3>
+
+                    <p>
+                        The completed analyzer will explain why the
+                        URL appears suspicious and what action the
+                        user should take.
+                    </p>
+                </div>
+            </div>
+
+            <ul class="indicator-list">
+                <li>
+                    <span>!</span>
+                    Login-related keyword detected
+                </li>
+
+                <li>
+                    <span>!</span>
+                    Unusual domain structure
+                </li>
+
+                <li>
+                    <span>!</span>
+                    Possible impersonation pattern
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section
+    class="section"
+    id="tools"
+>
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">
+                Security Toolkit
+            </span>
+
+            <h2>
+                One platform, multiple protection tools
+            </h2>
+
+            <p>
+                Every analyzer will provide structured results,
+                detected warning signs and practical recommendations.
+            </p>
+        </div>
+
+        <div class="home-tools-grid">
+
+            <article class="home-tool-card">
+                <div class="home-tool-icon">
+                    🔗
+                </div>
+
+                <h3>URL Analyzer</h3>
+
+                <p>
+                    Analyze suspicious website links using
+                    security rules and machine learning.
+                </p>
+
+                <a
+                    href="{{ url_for('analyzer.url_analyzer') }}"
+                    class="button button-primary"
+                >
+                    Analyze URL
+                </a>
+            </article>
+
+
+            <article class="home-tool-card">
+                <div class="home-tool-icon">
+                    ✉️
+                </div>
+
+                <h3>Email Analyzer</h3>
+
+                <p>
+                    Inspect email content for phishing,
+                    urgency and social-engineering signals.
+                </p>
+
+                <a
+                    href="{{ url_for('analyzer.email_analyzer') }}"
+                    class="button button-primary"
+                >
+                    Analyze Email
+                </a>
+            </article>
+
+
+            <article class="home-tool-card">
+                <div class="home-tool-icon">
+                    ▦
+                </div>
+
+                <h3>QR Analyzer</h3>
+
+                <p>
+                    Decode QR codes and inspect hidden
+                    destinations before opening them.
+                </p>
+
+                <a
+                    href="{{ url_for('analyzer.qr_analyzer') }}"
+                    class="button button-primary"
+                >
+                    Analyze QR
+                </a>
+            </article>
+
+
+            <article class="home-tool-card">
+                <div class="home-tool-icon">
+                    🔐
+                </div>
+
+                <h3>Password Security</h3>
+
+                <p>
+                    Generate secure passwords and
+                    analyze password strength.
+                </p>
+
+                <a
+                    href="{{ url_for('password.password_tools') }}"
+                    class="button button-primary"
+                >
+                    Password Tools
+                </a>
+            </article>
+
+
+            <article class="home-tool-card">
+                <div class="home-tool-icon">
+                    🤖
+                </div>
+
+                <h3>AI Security Assistant</h3>
+
+                <p>
+                    Ask questions about phishing,
+                    suspicious links and cybersecurity.
+                </p>
+
+                <a
+                    href="{{ url_for('main.assistant') }}"
+                    class="button button-primary"
+                >
+                    Open Assistant
+                </a>
+            </article>
+
+        </div>
+
+        <div class="tools-grid">
+            {% for tool in tools %}
+                <article class="tool-card">
+                    <div class="tool-icon">
+                        {{ tool.icon }}
+                    </div>
+
+                    <h3>
+                        {{ tool.name }}
+                    </h3>
+
+                    <p>
+                        {{ tool.description }}
+                    </p>
+
+                    <span class="development-label">
+                        Under Development
+                    </span>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section
+    class="section alternate-section"
+    id="process"
+>
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">
+                Analysis Process
+            </span>
+
+            <h2>
+                How PhishGuard will analyze threats
+            </h2>
+        </div>
+
+        <div class="process-grid">
+            <article class="process-card">
+                <span>01</span>
+                <h3>Validate</h3>
+                <p>
+                    Validate submitted URLs, email content,
+                    passwords and uploaded QR images.
+                </p>
+            </article>
+
+            <article class="process-card">
+                <span>02</span>
+                <h3>Analyze</h3>
+                <p>
+                    Run security rules and machine-learning
+                    checks on the submitted content.
+                </p>
+            </article>
+
+            <article class="process-card">
+                <span>03</span>
+                <h3>Explain</h3>
+                <p>
+                    Convert technical findings into a clear
+                    AI-generated explanation.
+                </p>
+            </article>
+
+            <article class="process-card">
+                <span>04</span>
+                <h3>Recommend</h3>
+                <p>
+                    Provide a risk score, warning indicators
+                    and recommended next actions.
+                </p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section
+    class="section"
+    id="technology"
+>
+    <div class="container technology-panel">
+        <div>
+            <span class="eyebrow">
+                Project Technology
+            </span>
+
+            <h2>
+                Built using separated and testable components
+            </h2>
+
+            <p>
+                Detection, AI explanation, authentication, history
+                and interface logic will remain separated to make
+                the project easier to test and maintain.
+            </p>
+        </div>
+
+        <div class="technology-list">
+            <span>Python</span>
+            <span>Flask</span>
+            <span>SQLite</span>
+            <span>SQLAlchemy</span>
+            <span>Scikit-learn</span>
+            <span>HTML</span>
+            <span>CSS</span>
+            <span>JavaScript</span>
+        </div>
+    </div>
+</section>
+{% endblock %}

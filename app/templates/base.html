@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="csrf-token"
+        content="{{ csrf_token() }}">
+    <meta name="description" content="PhishGuard AI and ML cybersecurity platform">
+
+    <title>
+        {% block title %}
+            PhishGuard AI & ML
+        {% endblock %}
+    </title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/analyzer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/assistant.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/password.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    
+</head>
+
+<body>
+    <!-- Desktop / Mobile Sidebar Navigation -->
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+        <div class="sidebar-inner">
+
+            <!-- Brand -->
+            <a
+                class="sidebar-brand"
+                href="{{ url_for('main.home') }}"
+                aria-label="PhishGuard Home"
+            >
+                <span class="brand-symbol">
+                    PG
+                </span>
+
+                <span class="brand-details">
+                    <strong>
+                        PhishGuard
+                    </strong>
+
+                    <small>
+                        AI & ML Security Platform
+                    </small>
+                </span>
+            </a>
+
+
+            <!-- Navigation -->
+            <nav
+                class="sidebar-navigation"
+                id="navigation"
+            >
+
+                <a
+                    href="{{ url_for('main.home') }}"
+                    class="{% if request.endpoint == 'main.home' %}active{% endif %}"
+                >
+                    <span class="sidebar-nav-icon">⌂</span>
+                    <span>Home</span>
+                </a>
+
+
+                {% if current_user.is_authenticated %}
+
+                    <a
+                        href="{{ url_for('main.dashboard') }}"
+                        class="{% if request.endpoint == 'main.dashboard' %}active{% endif %}"
+                    >
+                        <span class="sidebar-nav-icon">▦</span>
+                        <span>Dashboard</span>
+                    </a>
+
+
+                    <a
+                        href="{{ url_for('history.history') }}"
+                        class="{% if request.blueprint == 'history' %}active{% endif %}"
+                    >
+                        <span class="sidebar-nav-icon">◷</span>
+                        <span>History</span>
+                    </a>
+
+
+                    {% if current_user.is_admin %}
+
+                        <a
+                            href="{{ url_for('admin.dashboard') }}"
+                            class="{% if request.blueprint == 'admin' %}active{% endif %}"
+                        >
+                            <span class="sidebar-nav-icon">
+                                ⚙
+                            </span>
+
+                            <span>
+                                Admin
+                            </span>
+                        </a>
+
+                    {% endif %}
+
+                {% endif %}
+
+
+                <a
+                    href="{{ url_for('main.home') }}#tools"
+                >
+                    <span class="sidebar-nav-icon">◇</span>
+                    <span>Security Tools</span>
+                </a>
+
+
+                <a
+                    href="{{ url_for('main.home') }}#process"
+                >
+                    <span class="sidebar-nav-icon">→</span>
+                    <span>How It Works</span>
+                </a>
+
+
+                <a
+                    href="{{ url_for('main.home') }}#technology"
+                >
+                    <span class="sidebar-nav-icon">◫</span>
+                    <span>Technology</span>
+                </a>
+
+            </nav>
+
+
+            <!-- Account -->
+            <div class="sidebar-account">
+
+                {% if current_user.is_authenticated %}
+
+                    <div class="sidebar-user">
+
+                        <div class="user-avatar">
+                            {{ current_user.full_name[:1] | upper }}
+                        </div>
+
+                        <div class="user-profile-text">
+
+                            <span>
+                                Signed in as
+                            </span>
+
+                            <strong>
+                                {{ current_user.full_name }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <form
+                        class="logout-form"
+                        method="POST"
+                        action="{{ url_for('auth.logout') }}"
+                    >
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token() }}">
+                        <button
+                            class="sidebar-logout-button"
+                            type="submit"
+                        >
+                            Log Out
+                        </button>
+                    </form>
+
+
+                {% else %}
+
+                    <a
+                        class="sidebar-login-button"
+                        href="{{ url_for('auth.login') }}"
+                    >
+                        Log In
+                    </a>
+
+                    <a
+                        class="button button-primary sidebar-register-button"
+                        href="{{ url_for('auth.register') }}"
+                    >
+                        Create Account
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+    </aside>
+
+
+    <!-- Mobile Top Bar -->
+    <header class="mobile-header">
+
+        <a
+            class="mobile-brand"
+            href="{{ url_for('main.home') }}"
+        >
+            <span class="brand-symbol">
+                PG
+            </span>
+
+            <strong>
+                PhishGuard
+            </strong>
+        </a>
+
+
+        <button
+            class="menu-button"
+            id="menuButton"
+            type="button"
+            aria-label="Open navigation menu"
+            aria-expanded="false"
+            aria-controls="sidebar"
+        >
+            ☰
+        </button>
+
+    </header>
+
+
+    <!-- Mobile backdrop -->
+    <div
+        class="sidebar-backdrop"
+        id="sidebarBackdrop"
+    ></div>
+
+    <!-- Main Content Area -->
+    <main class="page-shell">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="container flash-container">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            <span>{{ message }}</span>
+
+                            <button
+                                class="flash-close"
+                                type="button"
+                                aria-label="Close message"
+                            >
+                                ×
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer page-shell-footer">
+        <div class="container footer-content">
+            <div>
+                <strong>PhishGuard AI & ML</strong>
+                <p>
+                    Intelligent analysis for safer digital decisions.
+                </p>
+            </div>
+
+            <div class="footer-credit">
+                <p>
+                    B.Tech CSE AI & ML Project
+                </p>
+                <p>
+                    Developed by <strong>Pankaj Pawar</strong>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    {% block scripts %}{% endblock %}
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

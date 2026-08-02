@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Scan Report | PhishGuard AI & ML
+{% endblock %}
+
+{% block content %}
+<section class="scan-details-section">
+    <div class="container">
+        <div class="report-actions">
+            <a
+                href="{{ url_for('history.history') }}"
+                class="button button-outline"
+            >
+                ← Back to History
+            </a>
+
+            <a
+                href="{{ url_for('history.download_scan_pdf', scan_id=scan.id) }}"
+                class="button button-primary"
+            >
+                Download PDF
+            </a>
+        </div>
+
+        <div
+            class="scan-report-header report-{{ scan.risk_level | lower }}"
+        >
+            <div>
+                <span class="eyebrow">
+                    {{ scan.scan_type }} Security Report
+                </span>
+
+                <h1>{{ scan.prediction }}</h1>
+
+                <p>{{ scan.input_value }}</p>
+            </div>
+
+            <div class="report-score">
+                <strong>
+                    {{ scan.risk_score | int }}
+                </strong>
+
+                <span>Risk Score</span>
+            </div>
+        </div>
+
+        <div class="report-information-grid">
+            <article>
+                <span>Scan Type</span>
+                <strong>{{ scan.scan_type }}</strong>
+            </article>
+
+            <article>
+                <span>Risk Level</span>
+                <strong>{{ scan.risk_level }}</strong>
+            </article>
+
+            <article>
+                <span>Confidence</span>
+                <strong>
+                    {% if scan.confidence is not none %}
+                        {{ scan.confidence }}%
+                    {% else %}
+                        Not available
+                    {% endif %}
+                </strong>
+            </article>
+
+            <article>
+                <span>Scanned On</span>
+                <strong>
+                    {{ scan.created_at.strftime("%d %b %Y, %I:%M %p") }}
+                </strong>
+            </article>
+        </div>
+
+        <div class="scan-report-grid">
+            <section class="scan-report-card">
+                <h2>Security Explanation</h2>
+
+                <p class="report-explanation">
+                    {{ scan.explanation }}
+                </p>
+            </section>
+
+            <section class="scan-report-card">
+                <h2>Safety Recommendations</h2>
+
+                {% if recommendations %}
+                    <div class="report-recommendations">
+                        {% for recommendation in recommendations %}
+                            <div>
+                                <span>✓</span>
+
+                                <p>
+                                    {{ recommendation }}
+                                </p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="report-explanation">
+                        No recommendations were stored for this scan.
+                    </p>
+                {% endif %}
+            </section>
+        </div>
+
+        <div class="scan-report-actions">
+            <a
+                class="button button-primary"
+                href="{{ url_for('analyzer.url_analyzer') }}"
+            >
+                Analyze Another URL
+            </a>
+
+            <form
+                method="POST"
+                action="{{ url_for('history.delete_scan', scan_id=scan.id) }}"
+                onsubmit="return confirm('Delete this scan report permanently?');"
+            >
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}">
+                <button
+                    class="button danger-button"
+                    type="submit"
+                >
+                    Delete Report
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

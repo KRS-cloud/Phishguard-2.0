@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}
+    QR Analyzer | PhishGuard AI & ML
+{% endblock %}
+
+{% block content %}
+<section class="analyzer-section">
+    <div class="container">
+        <div class="analyzer-heading">
+            <span class="eyebrow">
+                QR Security Tool
+            </span>
+
+            <h1>QR Code Analyzer</h1>
+
+            <p>
+                Upload a QR-code image to reveal its hidden content
+                and analyze encoded website links for phishing risks.
+            </p>
+        </div>
+
+        <div class="analyzer-layout">
+            <section class="analyzer-card">
+                <div class="analyzer-card-heading">
+                    <h2>Upload QR Image</h2>
+
+                    <p>
+                        Choose a clear screenshot or photograph
+                        containing one QR code.
+                    </p>
+                </div>
+
+                <form
+                    class="analyzer-form"
+                    method="POST"
+                    action="{{ url_for('analyzer.qr_analyzer') }}"
+                    enctype="multipart/form-data"
+                >
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}">
+                    <div class="qr-upload-zone">
+                        <input
+                            id="qr_image"
+                            name="qr_image"
+                            type="file"
+                            accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+                            required
+                        >
+
+                        <label for="qr_image">
+                            <span class="qr-upload-icon">▦</span>
+
+                            <strong>
+                                Select QR-code image
+                            </strong>
+
+                            <small>
+                                PNG, JPG, JPEG, or WEBP — maximum 5 MB
+                            </small>
+                        </label>
+
+                        <p
+                            class="selected-file-name"
+                            id="selected-file-name"
+                        >
+                            {% if uploaded_filename %}
+                                {{ uploaded_filename }}
+                            {% else %}
+                                No image selected
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <button
+                        class="button button-primary analyzer-submit"
+                        type="submit"
+                    >
+                        Decode and Analyze QR
+                    </button>
+                </form>
+
+                <div class="analyzer-notice">
+                    <span>🔒</span>
+
+                    <p>
+                        The image is processed for QR decoding and is
+                        not permanently saved by this analyzer.
+                    </p>
+                </div>
+            </section>
+
+            <aside class="analysis-guide">
+                <h2>Image Tips</h2>
+
+                <ul>
+                    <li>Keep the complete QR code visible</li>
+                    <li>Avoid blurry or dark photographs</li>
+                    <li>Avoid strong reflections and shadows</li>
+                    <li>Use an image with good contrast</li>
+                    <li>Crop unnecessary background when possible</li>
+                    <li>Upload one QR code at a time</li>
+                </ul>
+            </aside>
+        </div>
+
+        {% if result %}
+            <section class="result-section">
+                <div
+                    class="result-summary result-{{ result.risk_level | lower }}"
+                >
+                    <div>
+                        <span class="result-label">
+                            QR Analysis Result
+                        </span>
+
+                        <h2>{{ result.prediction }}</h2>
+
+                        <p>
+                            Decoded content type:
+                            {{ result.content_type }}
+                        </p>
+                    </div>
+
+                    <div class="score-circle">
+                        <strong>
+                            {{ result.risk_score | int }}
+                        </strong>
+
+                        <span>Risk Score</span>
+                    </div>
+                </div>
+
+                <div class="result-statistics">
+                    <article>
+                        <span>Content Type</span>
+                        <strong>{{ result.content_type }}</strong>
+                    </article>
+
+                    <article>
+                        <span>Risk Level</span>
+                        <strong>{{ result.risk_level }}</strong>
+                    </article>
+
+                    <article>
+                        <span>Confidence</span>
+                        <strong>{{ result.confidence }}%</strong>
+                    </article>
+
+                    <article>
+                        <span>Image Size</span>
+
+                        <strong>
+                            {{ result.image_width }}
+                            ×
+                            {{ result.image_height }}
+                        </strong>
+                    </article>
+                </div>
+
+                <section class="result-card decoded-content-card">
+                    <div class="result-card-heading">
+                        <h2>Decoded QR Content</h2>
+
+                        <p>
+                            Review the hidden information before
+                            opening or using it.
+                        </p>
+                    </div>
+
+                    <div class="decoded-content-box">
+                        <code>{{ result.decoded_text }}</code>
+
+                        <button
+                            class="copy-content-button"
+                            type="button"
+                            data-copy-text="{{ result.decoded_text }}"
+                        >
+                            Copy
+                        </button>
+                    </div>
+
+                    {% if result.content_type == "URL" %}
+                        <p class="decoded-url-warning">
+                            For safety, PhishGuard does not open the
+                            decoded website automatically.
+                        </p>
+                    {% endif %}
+                </section>
+
+                <div class="result-grid">
+                    <section class="result-card">
+                        <div class="result-card-heading">
+                            <h2>Detected Indicators</h2>
+
+                            <p>
+                                QR or URL properties affecting the result.
+                            </p>
+                        </div>
+
+                        {% if result.reasons %}
+                            <div class="reason-list">
+                                {% for reason in result.reasons %}
+                                    <article class="reason-item">
+                                        <div>
+                                            <strong>
+                                                {{ reason.feature }}
+                                            </strong>
+
+                                            <p>
+                                                {{ reason.message }}
+                                            </p>
+                                        </div>
+
+                                        <span>
+                                            +{{ reason.score }}
+                                        </span>
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="positive-result">
+                                <span>✓</span>
+
+                                <p>
+                                    No major URL phishing indicators
+                                    were detected.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </section>
+
+                    <section class="result-card">
+                        <div class="result-card-heading">
+                            <h2>Safety Recommendations</h2>
+
+                            <p>
+                                Recommended actions for this QR code.
+                            </p>
+                        </div>
+
+                        <div class="recommendation-list">
+                            {% for recommendation in result.recommendations %}
+                                <div>
+                                    <span>✓</span>
+
+                                    <p>
+                                        {{ recommendation }}
+                                    </p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                </div>
+            </section>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

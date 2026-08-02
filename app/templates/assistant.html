@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}
+AI Security Assistant | PhishGuard
+{% endblock %}
+
+{% block content %}
+
+<section class="assistant-page">
+
+    <div class="assistant-header">
+        <span class="eyebrow">
+            PHISHGUARD AI
+        </span>
+
+        <h1>
+            AI Security Assistant
+        </h1>
+
+        <div class="assistant-status">
+            <span class="assistant-status-dot"></span>
+            AI-powered cybersecurity guidance
+        </div>
+
+        <p>
+            Ask questions about phishing,
+            suspicious websites, emails,
+            QR codes, passwords and online safety.
+        </p>
+    </div>
+
+    <div class="assistant-container">
+
+        <div
+            class="assistant-chat"
+            id="assistantChat"
+        >
+            <div class="chat-message assistant-message">
+                <div class="message-avatar">
+                    AI
+                </div>
+
+                <div class="message-content">
+                    <span>
+                        PhishGuard Assistant
+                    </span>
+
+                    <p>
+                        Hello! I'm your AI Security Assistant.
+                        Ask me anything about phishing or
+                        cybersecurity.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="assistant-suggestions">
+            <button
+                type="button"
+                class="suggestion-button"
+                data-question="What is phishing?"
+            >
+                What is phishing?
+            </button>
+
+            <button
+                type="button"
+                class="suggestion-button"
+                data-question="How can I identify a phishing email?"
+            >
+                Detect phishing email
+            </button>
+
+            <button
+                type="button"
+                class="suggestion-button"
+                data-question="Are QR codes safe?"
+            >
+                QR code safety
+            </button>
+
+            <button
+                type="button"
+                class="suggestion-button"
+                data-question="How do I create a strong password?"
+            >
+                Password security
+            </button>
+        </div>
+
+        <form
+            class="assistant-input-area"
+            id="assistantForm"
+        >
+            <input
+                type="text"
+                id="assistantInput"
+                placeholder="Ask a cybersecurity question..."
+                autocomplete="off"
+                maxlength="500"
+                required
+            >
+
+            <button
+                type="submit"
+                class="button button-primary"
+                id="assistantSendButton"
+            >
+                Send
+            </button>
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+
+
+{% endblock %}

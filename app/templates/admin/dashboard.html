@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Admin Dashboard | PhishGuard AI & ML
+{% endblock %}
+
+{% block content %}
+
+<section class="admin-section">
+
+    <div class="container">
+
+        <div class="admin-heading">
+
+            <div>
+                <span class="eyebrow">
+                    Administration
+                </span>
+
+                <h1>
+                    Admin Dashboard
+                </h1>
+
+                <p>
+                    Monitor users, authentication activity
+                    and platform usage.
+                </p>
+            </div>
+
+            <div class="admin-badge">
+                Administrator
+            </div>
+
+        </div>
+
+
+        <!-- Statistics -->
+
+        <div class="admin-stat-grid">
+
+            <article class="admin-stat-card">
+
+                <span>
+                    Registered Users
+                </span>
+
+                <strong>
+                    {{ total_users }}
+                </strong>
+
+                <p>
+                    Total PhishGuard accounts.
+                </p>
+
+            </article>
+
+
+            <article class="admin-stat-card">
+
+                <span>
+                    Active Now
+                </span>
+
+                <strong>
+                    {{ active_users }}
+                </strong>
+
+                <p>
+                    Active within the last 5 minutes.
+                </p>
+
+            </article>
+
+
+            <article class="admin-stat-card">
+
+                <span>
+                    Logged In Today
+                </span>
+
+                <strong>
+                    {{ logged_in_today }}
+                </strong>
+
+                <p>
+                    Accounts with a successful login today.
+                </p>
+
+            </article>
+
+
+            <article class="admin-stat-card">
+
+                <span>
+                    Total Scans
+                </span>
+
+                <strong>
+                    {{ total_scans }}
+                </strong>
+
+                <p>
+                    Security analyses performed.
+                </p>
+
+            </article>
+
+        </div>
+
+
+        <div class="admin-content-grid">
+
+            <!-- Users -->
+
+            <section class="admin-panel">
+
+                <div class="admin-panel-heading">
+
+                    <div>
+                        <h2>
+                            Recent Users
+                        </h2>
+
+                        <p>
+                            Recently created accounts.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                {% if recent_users %}
+
+                    <div class="admin-table-wrapper">
+
+                        <table class="admin-table">
+
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Joined</th>
+                                    <th>Last Login</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for user in recent_users %}
+
+                                    <tr>
+
+                                        <td>
+
+                                            <div class="admin-user-cell">
+
+                                                <div class="admin-user-avatar">
+                                                    {{ user.full_name[:1] | upper }}
+                                                </div>
+
+                                                <div>
+                                                    <strong>
+                                                        {{ user.full_name }}
+                                                    </strong>
+
+                                                    <span>
+                                                        {{ user.email }}
+                                                    </span>
+                                                </div>
+
+                                            </div>
+
+                                        </td>
+
+
+                                        <td>
+                                            {{ user.created_at.strftime("%d %b %Y") }}
+                                        </td>
+
+
+                                        <td>
+
+                                            {% if user.last_login %}
+
+                                                {{ user.last_login.strftime("%d %b, %H:%M") }}
+
+                                            {% else %}
+
+                                                Never
+
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <td>
+
+                                            {% if not user.is_active_account %}
+
+                                                <span class="admin-status disabled">
+                                                    Disabled
+                                                </span>
+
+                                            {% elif user.last_seen and user.last_seen >= active_threshold %}
+
+                                                <span class="admin-status online">
+                                                    Active
+                                                </span>
+
+                                            {% else %}
+
+                                                <span class="admin-status offline">
+                                                    Offline
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="admin-empty-state">
+
+                        <h3>
+                            No users
+                        </h3>
+
+                        <p>
+                            Registered accounts will appear here.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+
+            <!-- Recent scans -->
+
+            <section class="admin-panel">
+
+                <div class="admin-panel-heading">
+
+                    <div>
+                        <h2>
+                            Recent Security Activity
+                        </h2>
+
+                        <p>
+                            Latest analyses across the platform.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                {% if recent_scans %}
+
+                    <div class="admin-activity-list">
+
+                        {% for scan in recent_scans %}
+
+                            <article class="admin-activity-item">
+
+                                <div>
+
+                                    <div class="admin-activity-header">
+
+                                        <strong>
+                                            {{ scan.scan_type }}
+                                        </strong>
+
+                                        <span>
+                                            {{ scan.created_at.strftime("%d %b, %H:%M") }}
+                                        </span>
+
+                                    </div>
+
+                                    <p>
+                                        {{ scan.input_value }}
+                                    </p>
+
+                                </div>
+
+
+                                <span
+                                    class="admin-risk-badge
+                                    {% if scan.prediction == 'Safe' %}
+                                        safe
+                                    {% elif scan.prediction == 'Phishing' %}
+                                        danger
+                                    {% else %}
+                                        warning
+                                    {% endif %}"
+                                >
+                                    {{ scan.prediction }}
+                                </span>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="admin-empty-state">
+
+                        <h3>
+                            No scan activity
+                        </h3>
+
+                        <p>
+                            Security scans will appear here.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

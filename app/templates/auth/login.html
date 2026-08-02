@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Log In | PhishGuard AI & ML
+{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="container auth-layout">
+        <div class="auth-information">
+            <span class="eyebrow">
+                Welcome Back
+            </span>
+
+            <h1>
+                Continue your secure browsing journey.
+            </h1>
+
+            <p>
+                Log in to access your personal dashboard, security
+                reports and scan history.
+            </p>
+
+            <div class="auth-benefits">
+                <div>
+                    <span>✓</span>
+
+                    <p>
+                        Access your saved security scans.
+                    </p>
+                </div>
+
+                <div>
+                    <span>✓</span>
+
+                    <p>
+                        Review previous risk reports.
+                    </p>
+                </div>
+
+                <div>
+                    <span>✓</span>
+
+                    <p>
+                        Use intelligent phishing-analysis tools.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <h2>Log In</h2>
+
+                <p>
+                    Enter your account credentials.
+                </p>
+            </div>
+
+            <form
+                class="auth-form"
+                method="POST"
+                action="{{ url_for('auth.login', next=request.args.get('next')) }}"
+                autocomplete="off"
+                novalidate
+            >
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value="{{ email | default('') }}"
+                        placeholder="Enter your email address"
+                        maxlength="120"
+                        autocomplete="off"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <div class="password-field">
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="Enter your password"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            class="password-toggle"
+                            type="button"
+                            data-password-target="password"
+                        >
+                            Show
+                        </button>
+                    </div>
+                </div>
+
+                <p class="auth-switch">
+                    <a href="{{ url_for('auth.forgot_password') }}">
+                        Forgot your password?
+                    </a>
+                </p>
+
+                <label class="remember-option">
+                    <input
+                        name="remember_me"
+                        type="checkbox"
+                    >
+
+                    <span>
+                        Keep me logged in
+                    </span>
+                </label>
+
+                <button
+                    class="button button-primary auth-submit"
+                    type="submit"
+                >
+                    Log In
+                </button>
+            </form>
+
+            <p class="auth-switch">
+                Do not have an account?
+
+                <a href="{{ url_for('auth.register') }}">
+                    Create one
+                </a>
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

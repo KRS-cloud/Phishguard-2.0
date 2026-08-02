@@ -1,0 +1,517 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard | PhishGuard AI & ML
+{% endblock %}
+
+{% block content %}
+
+<section class="dashboard-section">
+    <div class="container">
+
+        <div class="dashboard-heading">
+            <div>
+                <span class="eyebrow">
+                    SECURITY OVERVIEW
+                </span>
+
+                <h1>
+                    Welcome, {{ current_user.full_name }}
+                </h1>
+
+                <p>
+                    Monitor your security activity,
+                    scan history and threat detections.
+                </p>
+            </div>
+
+            <div class="dashboard-account">
+                <span>
+                    Signed in as
+                </span>
+
+                <strong>
+                    {{ current_user.email }}
+                </strong>
+            </div>
+        </div>
+
+        <!-- STATISTICS -->
+        <div class="statistics-grid statistics-grid-four">
+
+            <article class="statistic-card">
+                <span>
+                    Total Scans
+                </span>
+
+                <strong>
+                    {{ total_scans }}
+                </strong>
+
+                <p>
+                    {{ today_scans }} scans today
+                </p>
+            </article>
+
+            <article class="statistic-card">
+                <span>
+                    Safe Results
+                </span>
+
+                <strong>
+                    {{ safe_scans }}
+                </strong>
+
+                <p>
+                    No major phishing indicators.
+                </p>
+            </article>
+
+            <article class="statistic-card">
+                <span>
+                    Suspicious
+                </span>
+
+                <strong>
+                    {{ suspicious_scans }}
+                </strong>
+
+                <p>
+                    Results requiring verification.
+                </p>
+            </article>
+
+            <article class="statistic-card">
+                <span>
+                    Threats Detected
+                </span>
+
+                <strong>
+                    {{ phishing_scans }}
+                </strong>
+
+                <p>
+                    Potential phishing threats.
+                </p>
+            </article>
+
+        </div>
+
+        <!-- RISK DISTRIBUTION -->
+        <section class="dashboard-panel">
+
+            <div class="panel-heading">
+                <div>
+                    <span class="eyebrow">
+                        RISK ANALYTICS
+                    </span>
+
+                    <h2>
+                        Risk Distribution
+                    </h2>
+
+                    <p>
+                        Overview of all your scan results.
+                    </p>
+                </div>
+            </div>
+
+            {% set total = total_scans if total_scans > 0 else 1 %}
+
+            <div class="risk-distribution">
+
+                <div class="risk-row">
+                    <div class="risk-label">
+                        <span>Safe</span>
+                        <strong>{{ safe_scans }}</strong>
+                    </div>
+
+                    <div class="risk-track">
+                        <div
+                            class="risk-fill risk-safe"
+                            style="width: {{ (safe_scans / total * 100) | round(1) }}%;"
+                        ></div>
+                    </div>
+                </div>
+
+                <div class="risk-row">
+                    <div class="risk-label">
+                        <span>Suspicious</span>
+                        <strong>{{ suspicious_scans }}</strong>
+                    </div>
+
+                    <div class="risk-track">
+                        <div
+                            class="risk-fill risk-suspicious"
+                            style="width: {{ (suspicious_scans / total * 100) | round(1) }}%;"
+                        ></div>
+                    </div>
+                </div>
+
+                <div class="risk-row">
+                    <div class="risk-label">
+                        <span>Phishing</span>
+                        <strong>{{ phishing_scans }}</strong>
+                    </div>
+
+                    <div class="risk-track">
+                        <div
+                            class="risk-fill risk-phishing"
+                            style="width: {{ (phishing_scans / total * 100) | round(1) }}%;"
+                        ></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- 7 DAY ACTIVITY -->
+        <section class="dashboard-panel">
+
+            <div class="panel-heading">
+                <div>
+                    <span class="eyebrow">
+                        ACTIVITY
+                    </span>
+
+                    <h2>
+                        Last 7 Days
+                    </h2>
+
+                    <p>
+                        Daily scan activity.
+                    </p>
+                </div>
+            </div>
+
+            <div class="activity-chart">
+                {% for item in last_7_days %}
+                    <div class="activity-column">
+                        <div class="activity-value">
+                            {{ item.count }}
+                        </div>
+
+                        <div class="activity-bar-area">
+                            <div
+                                class="activity-bar"
+                                style="height: {{ (item.count / max_daily_scans * 100) | round(0) if max_daily_scans > 0 else 0 }}%;"
+                            ></div>
+                        </div>
+
+                        <span>
+                            {{ item.day }}
+                        </span>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </section>
+
+        <!-- MAIN GRID -->
+        <div class="dashboard-grid">
+
+            <!-- SECURITY TOOLS -->
+            <section class="dashboard-panel">
+
+                <div class="panel-heading">
+                    <div>
+                        <h2>
+                            Security Tools
+                        </h2>
+
+                        <p>
+                            Start a new security analysis.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="tool-grid">
+
+                    <article class="tool-card">
+                        <span class="tool-icon">
+                            🔗
+                        </span>
+
+                        <h3>
+                            URL Analyzer
+                        </h3>
+
+                        <p>
+                            Analyze website links for phishing risks.
+                        </p>
+
+                        <a
+                            class="button button-primary tool-action-button"
+                            href="{{ url_for('analyzer.url_analyzer') }}"
+                        >
+                            Analyze URL
+                        </a>
+                    </article>
+
+                    <article class="tool-card">
+                        <span class="tool-icon">
+                            ✉️
+                        </span>
+
+                        <h3>
+                            Email Analyzer
+                        </h3>
+
+                        <p>
+                            Inspect suspicious emails and
+                            social-engineering patterns.
+                        </p>
+
+                        <a
+                            class="button button-primary tool-action-button"
+                            href="{{ url_for('analyzer.email_analyzer') }}"
+                        >
+                            Analyze Email
+                        </a>
+                    </article>
+
+                    <article class="tool-card">
+                        <span class="tool-icon">
+                            ▦
+                        </span>
+
+                        <h3>
+                            QR Analyzer
+                        </h3>
+
+                        <p>
+                            Decode and analyze URLs hidden in QR codes.
+                        </p>
+
+                        <a
+                            class="button button-primary tool-action-button"
+                            href="{{ url_for('analyzer.qr_analyzer') }}"
+                        >
+                            Analyze QR
+                        </a>
+                    </article>
+
+                    <article class="tool-card">
+                        <span class="tool-icon">
+                            🔐
+                        </span>
+
+                        <h3>
+                            Password Security
+                        </h3>
+
+                        <p>
+                            Generate passwords and analyze strength.
+                        </p>
+
+                        <a
+                            href="{{ url_for('password.password_tools') }}"
+                            class="button button-primary tool-action-button"
+                        >
+                            Password Tools
+                        </a>
+                    </article>
+
+                    <article class="tool-card">
+                        <span class="tool-icon">
+                            🤖
+                        </span>
+
+                        <h3>
+                            AI Security Assistant
+                        </h3>
+
+                        <p>
+                            Ask questions about phishing and cybersecurity.
+                        </p>
+
+                        <a
+                            href="{{ url_for('main.assistant') }}"
+                            class="button button-primary tool-action-button"
+                        >
+                            Open Assistant
+                        </a>
+                    </article>
+
+                </div>
+
+            </section>
+
+            <!-- RECENT SCANS -->
+            <section class="dashboard-panel">
+
+                <div class="panel-heading">
+                    <div>
+                        <h2>
+                            Recent Scans
+                        </h2>
+
+                        <p>
+                            Your latest security reports.
+                        </p>
+                    </div>
+                </div>
+
+                {% if recent_scans %}
+
+                    <div class="recent-scan-list">
+
+                        {% for scan in recent_scans %}
+
+                            <article class="recent-scan">
+
+                                <div class="recent-scan-content">
+                                    <strong>
+                                        {{ scan.scan_type }}
+                                    </strong>
+
+                                    <p title="{{ scan.input_value }}">
+                                        {{ scan.input_value }}
+                                    </p>
+                                </div>
+
+                                <div class="recent-scan-meta">
+                                    <span class="risk-badge risk-badge-{{ scan.risk_level | lower if scan.risk_level else 'unknown' }}">
+                                        {{ scan.risk_level }}
+                                    </span>
+
+                                    <small>
+                                        Risk: {{ scan.risk_score | round(1) }}%
+                                    </small>
+
+                                    <small>
+                                        {{ scan.created_at.strftime("%d %b %Y, %I:%M %p") if scan.created_at else "" }}
+                                    </small>
+                                </div>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-state">
+                        <span>
+                            🛡️
+                        </span>
+
+                        <h3>
+                            No security scans yet
+                        </h3>
+
+                        <p>
+                            Your completed analyses will appear here.
+                        </p>
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+        <!-- RECENT ALERTS -->
+        <section class="dashboard-panel">
+
+            <div class="panel-heading">
+                <div>
+                    <span class="eyebrow">
+                        THREAT MONITOR
+                    </span>
+
+                    <h2>
+                        Recent Alerts
+                    </h2>
+
+                    <p>
+                        Suspicious and phishing detections.
+                    </p>
+                </div>
+            </div>
+
+            {% if recent_alerts %}
+
+                <div class="alert-list">
+
+                    {% for scan in recent_alerts %}
+
+                        <article class="alert-item">
+
+                            <div class="alert-icon">
+                                !
+                            </div>
+
+                            <div class="alert-content">
+                                <strong>
+                                    {{ scan.prediction }} Detection
+                                </strong>
+
+                                <p>
+                                    {{ scan.input_value }}
+                                </p>
+
+                                <small>
+                                    {{ scan.scan_type }}
+                                    ·
+                                    Risk {{ scan.risk_score | round(1) }}%
+                                    ·
+                                    {{ scan.created_at.strftime("%d %b %Y, %I:%M %p") if scan.created_at else "" }}
+                                </small>
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+                    <span>
+                        ✅
+                    </span>
+
+                    <h3>
+                        No recent alerts
+                    </h3>
+
+                    <p>
+                        Suspicious and phishing results will appear here.
+                    </p>
+                </div>
+
+            {% endif %}
+
+        </section>
+
+        <!-- SECURITY TIP -->
+        <section class="security-tip-card">
+
+            <div class="security-tip-icon">
+                i
+            </div>
+
+            <div>
+                <span class="eyebrow">
+                    SECURITY TIP
+                </span>
+
+                <h3>
+                    Today's Security Tip
+                </h3>
+
+                <p>
+                    {{ security_tip }}
+                </p>
+            </div>
+
+        </section>
+
+    </div>
+</section>
+
+{% endblock %}
