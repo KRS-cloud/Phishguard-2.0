@@ -59,7 +59,7 @@ def security():
     return render_template("security.html")
 
 
-@main_bp.route("google590769cadd41dffa.html")
+@main_bp.route("/google590769cadd41dffa.html")
 def google_verification():
     """Serve Google Search Console ownership verification file from static directory."""
 
