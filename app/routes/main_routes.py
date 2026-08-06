@@ -2,10 +2,12 @@ from datetime import datetime, timedelta
 
 from flask import (
     Blueprint,
+    current_app,
     jsonify,
     render_template,
     request,
     Response,
+    send_from_directory,
 )
 from flask_login import current_user, login_required
 
@@ -55,6 +57,13 @@ def security():
     """Explain safe use and the project's defensive scope."""
 
     return render_template("security.html")
+
+
+@main_bp.route("google590769cadd41dffa.html")
+def google_verification():
+    """Serve Google Search Console ownership verification file from static directory."""
+
+    return send_from_directory(current_app.static_folder, "google590769cadd41dffa.html")
 
 
 @main_bp.route("/robots.txt")
