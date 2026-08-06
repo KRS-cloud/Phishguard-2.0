@@ -1,736 +1,0 @@
-README.md:3: trailing whitespace.
-[32m+[m[32mPhishGuard is a defensive B.Tech CSE (AI & ML) project developed by[m[41m[m
-README.md:4: trailing whitespace.
-[32m+[m[32mPankaj Pawar. It demonstrates passive phishing-risk analysis with Flask,[m[41m[m
-README.md:5: trailing whitespace.
-[32m+[m[32mexplainable security rules, a small machine-learning model and optional[m[41m[m
-README.md:6: trailing whitespace.
-[32m+[m[32mGoogle Gemini guidance.[m[41m[m
-README.md:8: trailing whitespace.
-[32m+[m[32mThe project is intended for cybersecurity awareness, classroom evaluation[m[41m[m
-README.md:9: trailing whitespace.
-[32m+[m[32mand defensive learning. It is not a browser, antivirus product, threat-feed[m[41m[m
-README.md:10: trailing whitespace.
-[32m+[m[32mservice or guarantee that submitted content is safe.[m[41m[m
-README.md:12: trailing whitespace.
-[32m+[m[32m## Features[m[41m[m
-README.md:14: trailing whitespace.
-[32m+[m[32m- Account registration, login, logout and signed password-reset links[m[41m[m
-README.md:15: trailing whitespace.
-[32m+[m[32m- URL structure analysis without visiting the destination[m[41m[m
-README.md:16: trailing whitespace.
-[32m+[m[32m- Email-text analysis for social-engineering indicators[m[41m[m
-README.md:17: trailing whitespace.
-[32m+[m[32m- QR decoding without automatically opening the destination[m[41m[m
-README.md:18: trailing whitespace.
-[32m+[m[32m- Browser-only password generation using the Web Crypto API[m[41m[m
-README.md:19: trailing whitespace.
-[32m+[m[32m- Personal scan history, PDF reports and CSV export[m[41m[m
-README.md:20: trailing whitespace.
-[32m+[m[32m- Optional Google Gemini security assistant with a local fallback[m[41m[m
-README.md:21: trailing whitespace.
-[32m+[m[32m- Administrator usage statistics without exposing scan inputs in the feed[m[41m[m
-README.md:22: trailing whitespace.
-[32m+[m[32m- CSRF protection, request rate limits and production security headers[m[41m[m
-README.md:24: trailing whitespace.
-[32m+[m[32mThe public deployment does **not** include a password-strength checker.[m[41m[m
-README.md:25: trailing whitespace.
-[32m+[m[32mUsers should never submit passwords, OTPs, private keys, financial details[m[41m[m
-README.md:26: trailing whitespace.
-[32m+[m[32mor confidential content to an analyzer or AI assistant.[m[41m[m
-README.md:28: trailing whitespace.
-[32m+[m[32m## How analysis works[m[41m[m
-README.md:30: trailing whitespace.
-[32m+[m[32m1. The application validates user-controlled input.[m[41m[m
-README.md:31: trailing whitespace.
-[32m+[m[32m2. Explainable rules extract structural warning indicators.[m[41m[m
-README.md:32: trailing whitespace.
-[32m+[m[32m3. URL rules may be blended with a local Random Forest prediction.[m[41m[m
-README.md:33: trailing whitespace.
-[32m+[m[32m4. The interface presents a risk estimate, reasons and safety guidance.[m[41m[m
-README.md:34: trailing whitespace.
-[32m+[m[32m5. A minimized summary is stored in the signed-in user's history.[m[41m[m
-README.md:35: trailing whitespace.
-[32m+[m[41m[m
-README.md:36: trailing whitespace.
-[32m+[m[32mURL and QR destinations are not fetched or opened. Email analysis operates[m[41m[m
-README.md:37: trailing whitespace.
-[32m+[m[32monly on text the user deliberately pastes; it does not access a mailbox.[m[41m[m
-README.md:38: trailing whitespace.
-[32m+[m[41m[m
-README.md:39: trailing whitespace.
-[32m+[m[32m## Privacy design[m[41m[m
-README.md:40: trailing whitespace.
-[32m+[m[41m[m
-README.md:41: trailing whitespace.
-[32m+[m[32m- URL history retains only the origin, such as `https://example.com`.[m[41m[m
-README.md:42: trailing whitespace.
-[32m+[m[32m  Credentials, paths, query strings and fragments are discarded.[m[41m[m
-README.md:43: trailing whitespace.
-[32m+[m[32m- Email sender, subject and body are not retained in scan history.[m[41m[m
-README.md:44: trailing whitespace.
-[32m+[m[32m- QR images are not saved. Full decoded text is not retained in history.[m[41m[m
-README.md:45: trailing whitespace.
-[32m+[m[32m- Passwords are stored only as Werkzeug password hashes.[m[41m[m
-README.md:46: trailing whitespace.
-[32m+[m[32m- The password generator runs entirely in the browser.[m[41m[m
-README.md:47: trailing whitespace.
-[32m+[m[32m- AI assistant questions may be sent to Google Gemini. PhishGuard does not[m[41m[m
-README.md:48: trailing whitespace.
-[32m+[m[32m  retain the assistant conversation in its session cookie.[m[41m[m
-README.md:49: trailing whitespace.
-[32m+[m[32m- Neon hosts production account/history data and Brevo sends transactional[m[41m[m
-README.md:50: trailing whitespace.
-[32m+[m[32m  password-recovery email.[m[41m[m
-README.md:51: trailing whitespace.
-[32m+[m[41m[m
-README.md:52: trailing whitespace.
-[32m+[m[32mSee the in-app About, Privacy and Security pages for user-facing notices.[m[41m[m
-README.md:53: trailing whitespace.
-[32m+[m[41m[m
-README.md:54: trailing whitespace.
-[32m+[m[32m## Technology[m[41m[m
-README.md:55: trailing whitespace.
-[32m+[m[41m[m
-README.md:56: trailing whitespace.
-[32m+[m[32m- Python 3.13 and Flask[m[41m[m
-README.md:57: trailing whitespace.
-[32m+[m[32m- Flask-SQLAlchemy with SQLite locally and PostgreSQL/Neon in production[m[41m[m
-README.md:58: trailing whitespace.
-[32m+[m[32m- Flask-Login, Flask-WTF CSRF and Flask-Limiter[m[41m[m
-README.md:59: trailing whitespace.
-[32m+[m[32m- scikit-learn, pandas and joblib[m[41m[m
-README.md:60: trailing whitespace.
-[32m+[m[32m- OpenCV and Pillow for QR processing[m[41m[m
-README.md:61: trailing whitespace.
-[32m+[m[32m- Google GenAI SDK for the optional assistant[m[41m[m
-README.md:62: trailing whitespace.
-[32m+[m[32m- Brevo transactional email API[m[41m[m
-README.md:63: trailing whitespace.
-[32m+[m[32m- HTML, CSS and JavaScript[m[41m[m
-README.md:64: trailing whitespace.
-[32m+[m[41m[m
-README.md:65: trailing whitespace.
-[32m+[m[32m## Project structure[m[41m[m
-README.md:66: trailing whitespace.
-[32m+[m[41m[m
-README.md:67: trailing whitespace.
-[32m+[m[32m```text[m[41m[m
-README.md:68: trailing whitespace.
-[32m+[m[32mapp/[m[41m[m
-README.md:69: trailing whitespace.
-[32m+[m[32m  ml/             Feature extraction[m[41m[m
-README.md:70: trailing whitespace.
-[32m+[m[32m  models/         SQLAlchemy models[m[41m[m
-README.md:71: trailing whitespace.
-[32m+[m[32m  routes/         Flask blueprints[m[41m[m
-README.md:72: trailing whitespace.
-[32m+[m[32m  services/       Analysis, AI and email services[m[41m[m
-README.md:73: trailing whitespace.
-[32m+[m[32m  static/         CSS and browser JavaScript[m[41m[m
-README.md:74: trailing whitespace.
-[32m+[m[32m  templates/      Jinja templates[m[41m[m
-README.md:75: trailing whitespace.
-[32m+[m[32mtests/            unittest regression suite[m[41m[m
-README.md:76: trailing whitespace.
-[32m+[m[32mtrained_models/   Serialized URL model[m[41m[m
-README.md:77: trailing whitespace.
-[32m+[m[32mtraining/         Reproducible training script and small dataset[m[41m[m
-README.md:78: trailing whitespace.
-[32m+[m[32mconfig.py         Environment-based application configuration[m[41m[m
-README.md:79: trailing whitespace.
-[32m+[m[32mrun.py            Local and Gunicorn application entry point[m[41m[m
-README.md:80: trailing whitespace.
-[32m+[m[32m```[m[41m[m
-README.md:81: trailing whitespace.
-[32m+[m[41m[m
-README.md:82: trailing whitespace.
-[32m+[m[32m## Run locally[m[41m[m
-README.md:83: trailing whitespace.
-[32m+[m[41m[m
-README.md:84: trailing whitespace.
-[32m+[m[32m### 1. Create and activate a virtual environment[m[41m[m
-README.md:85: trailing whitespace.
-[32m+[m[41m[m
-README.md:86: trailing whitespace.
-[32m+[m[32mPowerShell:[m[41m[m
-README.md:87: trailing whitespace.
-[32m+[m[41m[m
-README.md:88: trailing whitespace.
-[32m+[m[32m```powershell[m[41m[m
-README.md:89: trailing whitespace.
-[32m+[m[32mpython -m venv venv[m[41m[m
-README.md:90: trailing whitespace.
-[32m+[m[32m.\venv\Scripts\Activate.ps1[m[41m[m
-README.md:91: trailing whitespace.
-[32m+[m[32m```[m[41m[m
-README.md:92: trailing whitespace.
-[32m+[m[41m[m
-README.md:93: trailing whitespace.
-[32m+[m[32m### 2. Install dependencies[m[41m[m
-README.md:94: trailing whitespace.
-[32m+[m[41m[m
-README.md:95: trailing whitespace.
-[32m+[m[32m```powershell[m[41m[m
-README.md:96: trailing whitespace.
-[32m+[m[32mpython -m pip install -r requirements.txt[m[41m[m
-README.md:97: trailing whitespace.
-[32m+[m[32m```[m[41m[m
-README.md:98: trailing whitespace.
-[32m+[m[41m[m
-README.md:99: trailing whitespace.
-[32m+[m[32m### 3. Configure the environment[m[41m[m
-README.md:100: trailing whitespace.
-[32m+[m[41m[m
-README.md:101: trailing whitespace.
-[32m+[m[32mCopy `.env.example` to `.env`, then replace every placeholder with your own[m[41m[m
-README.md:102: trailing whitespace.
-[32m+[m[32mvalue. Never commit `.env`.[m[41m[m
-README.md:103: trailing whitespace.
-[32m+[m[41m[m
-README.md:104: trailing whitespace.
-[32m+[m[32mGenerate a secret key without printing an existing secret:[m[41m[m
-README.md:105: trailing whitespace.
-[32m+[m[41m[m
-README.md:106: trailing whitespace.
-[32m+[m[32m```powershell[m[41m[m
-README.md:107: trailing whitespace.
-[32m+[m[32mpython -c "import secrets; print(secrets.token_hex(32))"[m[41m[m
-README.md:108: trailing whitespace.
-[32m+[m[32m```[m[41m[m
-README.md:109: trailing whitespace.
-[32m+[m[41m[m
-README.md:110: trailing whitespace.
-[32m+[m[32mFor local development, SQLite is used when `DATABASE_URL` is omitted.[m[41m[m
-README.md:111: trailing whitespace.
-[32m+[m[41m[m
-README.md:112: trailing whitespace.
-[32m+[m[32m### 4. Start the application[m[41m[m
-README.md:113: trailing whitespace.
-[32m+[m[41m[m
-README.md:114: trailing whitespace.
-[32m+[m[32m```powershell[m[41m[m
-README.md:115: trailing whitespace.
-[32m+[m[32mpython run.py[m[41m[m
-README.md:116: trailing whitespace.
-[32m+[m[32m```[m[41m[m
-README.md:117: trailing whitespace.
-[32m+[m[41m[m
-README.md:118: trailing whitespace.
-[32m+[m[32mOpen `http://127.0.0.1:5000` on the same computer.[m[41m[m
-README.md:119: trailing whitespace.
-[32m+[m[41m[m
-README.md:120: trailing whitespace.
-[32m+[m[32m## Environment variables[m[41m[m
-README.md:121: trailing whitespace.
-[32m+[m[41m[m
-README.md:122: trailing whitespace.
-[32m+[m[32m| Variable | Purpose |[m[41m[m
-README.md:123: trailing whitespace.
-[32m+[m[32m| --- | --- |[m[41m[m
-README.md:124: trailing whitespace.
-[32m+[m[32m| `SECRET_KEY` | Random secret of at least 32 characters; required |[m[41m[m
-README.md:125: trailing whitespace.
-[32m+[m[32m| `APP_ENV` | `development` locally or `production` when deployed |[m[41m[m
-README.md:126: trailing whitespace.
-[32m+[m[32m| `DATABASE_URL` | PostgreSQL/Neon pooled URL; required in production |[m[41m[m
-README.md:127: trailing whitespace.
-[32m+[m[32m| `APP_BASE_URL` | Public HTTPS origin used in reset links |[m[41m[m
-README.md:128: trailing whitespace.
-[32m+[m[32m| `GEMINI_API_KEY` | Optional Google Gemini API credential |[m[41m[m
-README.md:129: trailing whitespace.
-[32m+[m[32m| `GEMINI_MODEL` | Gemini model name |[m[41m[m
-README.md:130: trailing whitespace.
-[32m+[m[32m| `BREVO_API_KEY` | Brevo transactional email API credential |[m[41m[m
-README.md:131: trailing whitespace.
-[32m+[m[32m| `BREVO_SENDER_EMAIL` | Verified Brevo sender address |[m[41m[m
-README.md:132: trailing whitespace.
-[32m+[m[32m| `BREVO_SENDER_NAME` | Sender display name |[m[41m[m
-README.md:133: trailing whitespace.
-[32m+[m[32m| `PASSWORD_RESET_MAX_AGE` | Reset-token lifetime in seconds |[m[41m[m
-README.md:134: trailing whitespace.
-[32m+[m[32m| `RATELIMIT_STORAGE_URI` | Flask-Limiter storage URI |[m[41m[m
-README.md:135: trailing whitespace.
-[32m+[m[32m| `COOKIE_SECURE` | Set `true` for HTTPS outside detected production |[m[41m[m
-README.md:136: trailing whitespace.
-[32m+[m[32m| `TRUST_PROXY` | Set `true` only behind a trusted single reverse proxy |[m[41m[m
-README.md:137: trailing whitespace.
-[32m+[m[41m[m
-README.md:138: trailing whitespace.
-[32m+[m[32mAll real credentials belong only in `.env` or the hosting provider's secret[m[41m[m
-README.md:139: trailing whitespace.
-[32m+[m[32menvironment settings. `.env.example` contains placeholders only.[m[41m[m
-README.md:140: trailing whitespace.
-[32m+[m[41m[m
-README.md:141: trailing whitespace.
-[32m+[m[32m## Tests[m[41m[m
-README.md:142: trailing whitespace.
-[32m+[m[41m[m
-README.md:143: trailing whitespace.
-[32m+[m[32mRun the full suite from the project root:[m[41m[m
-README.md:144: trailing whitespace.
-[32m+[m[41m[m
-README.md:145: trailing whitespace.
-[32m+[m[32m```powershell[m[41m[m
-README.md:146: trailing whitespace.
-[32m+[m[32mpython -m unittest discover -v[m[41m[m
-README.md:147: trailing whitespace.
-[32m+[m[32m```[m[41m[m
-README.md:148: trailing whitespace.
-[32m+[m[41m[m
-README.md:149: trailing whitespace.
-[32m+[m[32mAlso run syntax validation before deployment:[m[41m[m
-README.md:150: trailing whitespace.
-[32m+[m[41m[m
-README.md:151: trailing whitespace.
-[32m+[m[32m```powershell[m[41m[m
-README.md:152: trailing whitespace.
-[32m+[m[32mpython -m compileall app tests config.py run.py[m[41m[m
-README.md:153: trailing whitespace.
-[32m+[m[32m```[m[41m[m
-README.md:154: trailing whitespace.
-[32m+[m[41m[m
-README.md:155: trailing whitespace.
-[32m+[m[32mOn Windows, the repository also includes one combined safety check:[m[41m[m
-README.md:156: trailing whitespace.
-[32m+[m[41m[m
-README.md:157: trailing whitespace.
-[32m+[m[32m```powershell[m[41m[m
-README.md:158: trailing whitespace.
-[32m+[m[32m.\scripts\predeploy_check.ps1[m[41m[m
-README.md:159: trailing whitespace.
-[32m+[m[32m```[m[41m[m
-README.md:160: trailing whitespace.
-[32m+[m[41m[m
-README.md:161: trailing whitespace.
-[32m+[m[32m## Production deployment[m[41m[m
-README.md:162: trailing whitespace.
-[32m+[m[41m[m
-README.md:163: trailing whitespace.
-[32m+[m[32mUse a new service only after reviewing the public pages, dependency lock and[m[41m[m
-README.md:164: trailing whitespace.
-[32m+[m[32menvironment values. A typical Gunicorn start command is:[m[41m[m
-README.md:165: trailing whitespace.
-[32m+[m[41m[m
-README.md:166: trailing whitespace.
-[32m+[m[32m```text[m[41m[m
-README.md:167: trailing whitespace.
-[32m+[m[32mgunicorn run:app --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120[m[41m[m
-README.md:168: trailing whitespace.
-[32m+[m[32m```[m[41m[m
-README.md:169: trailing whitespace.
-[32m+[m[41m[m
-README.md:170: trailing whitespace.
-[32m+[m[32mRequired production settings include:[m[41m[m
-README.md:171: trailing whitespace.
-[32m+[m[41m[m
-README.md:172: trailing whitespace.
-[32m+[m[32m```env[m[41m[m
-README.md:173: trailing whitespace.
-[32m+[m[32mAPP_ENV=production[m[41m[m
-README.md:174: trailing whitespace.
-[32m+[m[32mSECRET_KEY=<new-random-secret>[m[41m[m
-README.md:175: trailing whitespace.
-[32m+[m[32mDATABASE_URL=<new-Neon-pooled-connection-url>[m[41m[m
-README.md:176: trailing whitespace.
-[32m+[m[32mAPP_BASE_URL=https://your-service.example[m[41m[m
-README.md:177: trailing whitespace.
-[32m+[m[32mCOOKIE_SECURE=true[m[41m[m
-README.md:178: trailing whitespace.
-[32m+[m[32mTRUST_PROXY=true[m[41m[m
-README.md:179: trailing whitespace.
-[32m+[m[32m```[m[41m[m
-README.md:180: trailing whitespace.
-[32m+[m[41m[m
-README.md:181: trailing whitespace.
-[32m+[m[32mAdd the Brevo and Gemini settings only through the host's secret environment[m[41m[m
-README.md:182: trailing whitespace.
-[32m+[m[32mconfiguration. Do not paste credentials into source files, commits, logs,[m[41m[m
-README.md:183: trailing whitespace.
-[32m+[m[32mscreenshots or support messages.[m[41m[m
-README.md:184: trailing whitespace.
-[32m+[m[41m[m
-README.md:185: trailing whitespace.
-[32m+[m[32m## Model limitations[m[41m[m
-README.md:186: trailing whitespace.
-[32m+[m[41m[m
-README.md:187: trailing whitespace.
-[32m+[m[32mThe included Random Forest is a proof of concept trained on only 79 labelled[m[41m[m
-README.md:188: trailing whitespace.
-[32m+[m[32mexamples (40 low-risk and 39 synthetic phishing-style URLs). Its measured[m[41m[m
-README.md:189: trailing whitespace.
-[32m+[m[32mtest accuracy is not evidence of real-world protection because the dataset is[m[41m[m
-README.md:190: trailing whitespace.
-[32m+[m[32msmall and synthetic. Results may contain false positives and false negatives.[m[41m[m
-README.md:191: trailing whitespace.
-[32m+[m[32mAlways verify important decisions using authoritative sources and established[m[41m[m
-README.md:192: trailing whitespace.
-[32m+[m[32msecurity products.[m[41m[m
-README.md:193: trailing whitespace.
-[32m+[m[41m[m
-README.md:194: trailing whitespace.
-[32m+[m[32m## Responsible use[m[41m[m
-README.md:195: trailing whitespace.
-[32m+[m[41m[m
-README.md:196: trailing whitespace.
-[32m+[m[32mUse PhishGuard only with content you are authorized to analyze. Do not use the[m[41m[m
-README.md:197: trailing whitespace.
-[32m+[m[32mproject for impersonation, credential collection, unauthorized testing or[m[41m[m
-README.md:198: trailing whitespace.
-[32m+[m[32mmisleading users. The implementation and public interface are intentionally[m[41m[m
-README.md:199: trailing whitespace.
-[32m+[m[32mtransparent about who operates it, what it processes and its limitations.[m[41m[m
-app/routes/auth_routes.py:151: trailing whitespace.
-[32m+[m[41m[m
-app/routes/auth_routes.py:173: trailing whitespace.
-[32m+[m[41m[m
-app/routes/auth_routes.py:174: trailing whitespace.
-[32m+[m[41m[m
-app/routes/main_routes.py:230: trailing whitespace.
-[32m+[m[41m[m
-app/routes/main_routes.py:240: trailing whitespace.
-[32m+[m[41m[m
-app/routes/main_routes.py:271: trailing whitespace.
-[32m+[m[41m[m
-app/routes/main_routes.py:272: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:194: trailing whitespace.
-[32m+[m[32m// Confirm destructive form submissions without inline scripts.[m[41m[m
-app/static/js/main.js:195: trailing whitespace.
-[32m+[m[32mdocument[m[41m[m
-app/static/js/main.js:196: trailing whitespace.
-[32m+[m[32m    .querySelectorAll("form[data-confirm]")[m[41m[m
-app/static/js/main.js:197: trailing whitespace.
-[32m+[m[32m    .forEach((form) => {[m[41m[m
-app/static/js/main.js:198: trailing whitespace.
-[32m+[m[32m        form.addEventListener("submit", (event) => {[m[41m[m
-app/static/js/main.js:199: trailing whitespace.
-[32m+[m[32m            const message = form.dataset.confirm;[m[41m[m
-app/static/js/main.js:200: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:201: trailing whitespace.
-[32m+[m[32m            if (message && !window.confirm(message)) {[m[41m[m
-app/static/js/main.js:202: trailing whitespace.
-[32m+[m[32m                event.preventDefault();[m[41m[m
-app/static/js/main.js:203: trailing whitespace.
-[32m+[m[32m            }[m[41m[m
-app/static/js/main.js:204: trailing whitespace.
-[32m+[m[32m        });[m[41m[m
-app/static/js/main.js:205: trailing whitespace.
-[32m+[m[32m    });[m[41m[m
-app/static/js/main.js:206: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:274: trailing whitespace.
-[32m+[m[32m        // Treat both user and model output as untrusted plain text.[m[41m[m
-app/static/js/main.js:275: trailing whitespace.
-[32m+[m[32m        const paragraph = document.createElement("p");[m[41m[m
-app/static/js/main.js:276: trailing whitespace.
-[32m+[m[32m        paragraph.textContent = message;[m[41m[m
-app/static/js/main.js:277: trailing whitespace.
-[32m+[m[32m        content.appendChild(paragraph);[m[41m[m
-app/static/js/main.js:347: trailing whitespace.
-[32m+[m[32m    if (assistantChat) {[m[41m[m
-app/static/js/main.js:348: trailing whitespace.
-[32m+[m[32m        const storedExplanation = sessionStorage.getItem([m[41m[m
-app/static/js/main.js:349: trailing whitespace.
-[32m+[m[32m            "phishguard_scan_explanation"[m[41m[m
-app/static/js/main.js:350: trailing whitespace.
-[32m+[m[32m        );[m[41m[m
-app/static/js/main.js:351: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:352: trailing whitespace.
-[32m+[m[32m        if (storedExplanation) {[m[41m[m
-app/static/js/main.js:353: trailing whitespace.
-[32m+[m[32m            sessionStorage.removeItem("phishguard_scan_explanation");[m[41m[m
-app/static/js/main.js:354: trailing whitespace.
-[32m+[m[32m            addChatMessage(storedExplanation, "assistant");[m[41m[m
-app/static/js/main.js:355: trailing whitespace.
-[32m+[m[32m        }[m[41m[m
-app/static/js/main.js:356: trailing whitespace.
-[32m+[m[32m    }[m[41m[m
-app/static/js/main.js:357: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:388: trailing whitespace.
-[32m+[m[32m            explainScanButton.textContent = "Preparing Explanation...";[m[41m[m
-app/static/js/main.js:408: trailing whitespace.
-[32m+[m[32m                explainScanButton.textContent = "Explain Result";[m[41m[m
-app/static/js/main.js:413: trailing whitespace.
-[32m+[m[32m    // Browser-only password generator[m[41m[m
-app/static/js/main.js:426: trailing whitespace.
-[32m+[m[32m    function secureRandomIndex(maximum) {[m[41m[m
-app/static/js/main.js:427: trailing whitespace.
-[32m+[m[32m        if (!window.crypto || !window.crypto.getRandomValues) {[m[41m[m
-app/static/js/main.js:428: trailing whitespace.
-[32m+[m[32m            throw new Error([m[41m[m
-app/static/js/main.js:429: trailing whitespace.
-[32m+[m[32m                "Secure password generation is unavailable in this browser."[m[41m[m
-app/static/js/main.js:430: trailing whitespace.
-[32m+[m[32m            );[m[41m[m
-app/static/js/main.js:431: trailing whitespace.
-[32m+[m[32m        }[m[41m[m
-app/static/js/main.js:432: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:433: trailing whitespace.
-[32m+[m[32m        const acceptedRange = Math.floor(256 / maximum) * maximum;[m[41m[m
-app/static/js/main.js:434: trailing whitespace.
-[32m+[m[32m        const randomByte = new Uint8Array(1);[m[41m[m
-app/static/js/main.js:435: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:436: trailing whitespace.
-[32m+[m[32m        do {[m[41m[m
-app/static/js/main.js:437: trailing whitespace.
-[32m+[m[32m            window.crypto.getRandomValues(randomByte);[m[41m[m
-app/static/js/main.js:438: trailing whitespace.
-[32m+[m[32m        } while (randomByte[0] >= acceptedRange);[m[41m[m
-app/static/js/main.js:439: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:440: trailing whitespace.
-[32m+[m[32m        return randomByte[0] % maximum;[m[41m[m
-app/static/js/main.js:441: trailing whitespace.
-[32m+[m[32m    }[m[41m[m
-app/static/js/main.js:442: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:443: trailing whitespace.
-[32m+[m[32m    function secureChoice(characters) {[m[41m[m
-app/static/js/main.js:444: trailing whitespace.
-[32m+[m[32m        return characters[secureRandomIndex(characters.length)];[m[41m[m
-app/static/js/main.js:445: trailing whitespace.
-[32m+[m[32m    }[m[41m[m
-app/static/js/main.js:446: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:447: trailing whitespace.
-[32m+[m[32m    function secureShuffle(characters) {[m[41m[m
-app/static/js/main.js:448: trailing whitespace.
-[32m+[m[32m        for (let index = characters.length - 1; index > 0; index -= 1) {[m[41m[m
-app/static/js/main.js:449: trailing whitespace.
-[32m+[m[32m            const randomIndex = secureRandomIndex(index + 1);[m[41m[m
-app/static/js/main.js:450: trailing whitespace.
-[32m+[m[32m            const currentCharacter = characters[index];[m[41m[m
-app/static/js/main.js:451: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:452: trailing whitespace.
-[32m+[m[32m            characters[index] = characters[randomIndex];[m[41m[m
-app/static/js/main.js:453: trailing whitespace.
-[32m+[m[32m            characters[randomIndex] = currentCharacter;[m[41m[m
-app/static/js/main.js:454: trailing whitespace.
-[32m+[m[32m        }[m[41m[m
-app/static/js/main.js:455: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:456: trailing whitespace.
-[32m+[m[32m        return characters;[m[41m[m
-app/static/js/main.js:457: trailing whitespace.
-[32m+[m[32m    }[m[41m[m
-app/static/js/main.js:458: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:460: trailing whitespace.
-[32m+[m[32m        generatePasswordButton.addEventListener("click", function () {[m[41m[m
-app/static/js/main.js:462: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:468: trailing whitespace.
-[32m+[m[32m                const ambiguousCharacters = "Il1O0o";[m[41m[m
-app/static/js/main.js:469: trailing whitespace.
-[32m+[m[32m                const excludeAmbiguous =[m[41m[m
-app/static/js/main.js:470: trailing whitespace.
-[32m+[m[32m                    document.getElementById("excludeAmbiguous")?.checked ?? false;[m[41m[m
-app/static/js/main.js:471: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:472: trailing whitespace.
-[32m+[m[32m                const selectedGroups = [];[m[41m[m
-app/static/js/main.js:473: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:474: trailing whitespace.
-[32m+[m[32m                if (document.getElementById("useUppercase")?.checked) {[m[41m[m
-app/static/js/main.js:475: trailing whitespace.
-[32m+[m[32m                    selectedGroups.push("ABCDEFGHIJKLMNOPQRSTUVWXYZ");[m[41m[m
-app/static/js/main.js:476: trailing whitespace.
-[32m+[m[32m                }[m[41m[m
-app/static/js/main.js:477: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:478: trailing whitespace.
-[32m+[m[32m                if (document.getElementById("useLowercase")?.checked) {[m[41m[m
-app/static/js/main.js:479: trailing whitespace.
-[32m+[m[32m                    selectedGroups.push("abcdefghijklmnopqrstuvwxyz");[m[41m[m
-app/static/js/main.js:480: trailing whitespace.
-[32m+[m[32m                }[m[41m[m
-app/static/js/main.js:481: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:482: trailing whitespace.
-[32m+[m[32m                if (document.getElementById("useNumbers")?.checked) {[m[41m[m
-app/static/js/main.js:483: trailing whitespace.
-[32m+[m[32m                    selectedGroups.push("0123456789");[m[41m[m
-app/static/js/main.js:484: trailing whitespace.
-[32m+[m[32m                }[m[41m[m
-app/static/js/main.js:485: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:486: trailing whitespace.
-[32m+[m[32m                if (document.getElementById("useSymbols")?.checked) {[m[41m[m
-app/static/js/main.js:487: trailing whitespace.
-[32m+[m[32m                    selectedGroups.push("!@#$%^&*()-_=+[]{}?");[m[41m[m
-app/static/js/main.js:488: trailing whitespace.
-[32m+[m[32m                }[m[41m[m
-app/static/js/main.js:489: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:490: trailing whitespace.
-[32m+[m[32m                if (selectedGroups.length === 0) {[m[41m[m
-app/static/js/main.js:491: trailing whitespace.
-[32m+[m[32m                    throw new Error("Select at least one character group.");[m[41m[m
-app/static/js/main.js:492: trailing whitespace.
-[32m+[m[32m                }[m[41m[m
-app/static/js/main.js:493: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:494: trailing whitespace.
-[32m+[m[32m                const groups = selectedGroups.map(function (group) {[m[41m[m
-app/static/js/main.js:495: trailing whitespace.
-[32m+[m[32m                    if (!excludeAmbiguous) {[m[41m[m
-app/static/js/main.js:496: trailing whitespace.
-[32m+[m[32m                        return group;[m[41m[m
-app/static/js/main.js:498: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:499: trailing whitespace.
-[32m+[m[32m                    return Array.from(group)[m[41m[m
-app/static/js/main.js:500: trailing whitespace.
-[32m+[m[32m                        .filter(function (character) {[m[41m[m
-app/static/js/main.js:501: trailing whitespace.
-[32m+[m[32m                            return !ambiguousCharacters.includes(character);[m[41m[m
-app/static/js/main.js:502: trailing whitespace.
-[32m+[m[32m                        })[m[41m[m
-app/static/js/main.js:503: trailing whitespace.
-[32m+[m[32m                        .join("");[m[41m[m
-app/static/js/main.js:504: trailing whitespace.
-[32m+[m[32m                });[m[41m[m
-app/static/js/main.js:505: trailing whitespace.
-[32m+[m[41m[m
-app/static/js/main.js:506: trailing whitespace.
-[32m+[m[32m                const requestedLength = Number.parseInt([m[41m[m
-app/static/js/main.js:507: trailing whitespace.
-[32m+[m[32m                    passwordLength ? passwordLength.value : "18",[m[41m[m
-app/static/js/main.js:508: trailing whitespace.
-[32m+[m[32m                    10[m[41m[m
-app/static/js/main.js:511: trailing whitespace.
-[32m+[m[32m                const length = Math.max(12, Math.min(requestedLength, 64));[m[41m[m
-app/static/js/main.js:512: trailing whitespace.
-[32m+[m[32m                const combinedCharacters = groups.join("");[m[41m[m
-app/static/js/main.js:513: trailing whitespace.
-[32m+[m[32m                const passwordCharacters = groups.map(secureChoice);[m[41m[m
-app/static/js/main.js:515: trailing whitespace.
-[32m+[m[32m                while (passwordCharacters.length < length) {[m[41m[m
-app/static/js/main.js:516: trailing whitespace.
-[32m+[m[32m                    passwordCharacters.push([m[41m[m
-app/static/js/main.js:517: trailing whitespace.
-[32m+[m[32m                        secureChoice(combinedCharacters)[m[41m[m
-app/static/js/main.js:522: trailing whitespace.
-[32m+[m[32m                    generatedPassword.value = secureShuffle([m[41m[m
-app/static/js/main.js:523: trailing whitespace.
-[32m+[m[32m                        passwordCharacters[m[41m[m
-app/static/js/main.js:524: trailing whitespace.
-[32m+[m[32m                    ).join("");[m[41m[m
-app/static/js/main.js:541: trailing whitespace.
-[32m+[m[32m                await navigator.clipboard.writeText(generatedPassword.value);[m[41m[m
-app/static/js/main.js:543: trailing whitespace.
-[32m+[m[32m                copyPasswordButton.textContent = "Copied";[m[41m[m
-app/static/js/main.js:545: trailing whitespace.
-[32m+[m[32m                setTimeout(function () {[m[41m[m
-app/static/js/main.js:546: trailing whitespace.
-[32m+[m[32m                    copyPasswordButton.textContent = "Copy";[m[41m[m
-app/static/js/main.js:547: trailing whitespace.
-[32m+[m[32m                }, 1200);[m[41m[m
-app/static/js/main.js:549: trailing whitespace.
-[32m+[m[32m                copyPasswordButton.textContent = "Copy failed";[m[41m[m
-app/static/js/main.js:553: trailing whitespace.
-[32m+[m[32m});[m[41m[m
-app/templates/assistant.html:124: new blank line at EOF.
-app/templates/password/password_tools.html:4: trailing whitespace.
-[32m+[m[32m    Browser Password Generator | PhishGuard AI & ML[m[41m[m
-app/templates/password/password_tools.html:11: trailing whitespace.
-[32m+[m[32m            Browser-only utility[m[41m[m
-app/templates/password/password_tools.html:15: trailing whitespace.
-[32m+[m[32m            Secure Password Generator[m[41m[m
-app/templates/password/password_tools.html:19: trailing whitespace.
-[32m+[m[32m            Generate a random password directly in your browser.[m[41m[m
-app/templates/password/password_tools.html:20: trailing whitespace.
-[32m+[m[32m            PhishGuard does not receive, store or log the generated value.[m[41m[m
-app/templates/password/password_tools.html:24: trailing whitespace.
-[32m+[m[32m    <div class="password-privacy-notice" role="note">[m[41m[m
-app/templates/password/password_tools.html:25: trailing whitespace.
-[32m+[m[32m        <span aria-hidden="true">✓</span>[m[41m[m
-app/templates/password/password_tools.html:27: trailing whitespace.
-[32m+[m[32m        <div>[m[41m[m
-app/templates/password/password_tools.html:28: trailing whitespace.
-[32m+[m[32m            <strong>No password collection</strong>[m[41m[m
-app/templates/password/password_tools.html:29: trailing whitespace.
-[32m+[m[32m            <p>[m[41m[m
-app/templates/password/password_tools.html:30: trailing whitespace.
-[32m+[m[32m                Generation uses your browser's cryptographic random-number[m[41m[m
-app/templates/password/password_tools.html:31: trailing whitespace.
-[32m+[m[32m                generator. No password is transmitted to the server.[m[41m[m
-app/templates/password/password_tools.html:32: trailing whitespace.
-[32m+[m[32m            </p>[m[41m[m
-app/templates/password/password_tools.html:33: trailing whitespace.
-[32m+[m[32m        </div>[m[41m[m
-app/templates/password/password_tools.html:34: trailing whitespace.
-[32m+[m[32m    </div>[m[41m[m
-app/templates/password/password_tools.html:36: trailing whitespace.
-[32m+[m[32m    <div class="password-grid">[m[41m[m
-app/templates/password/password_tools.html:38: trailing whitespace.
-[32m+[m[32m            <h2>Password Generator</h2>[m[41m[m
-app/templates/password/password_tools.html:41: trailing whitespace.
-[32m+[m[32m                Choose the length and character groups, then generate a[m[41m[m
-app/templates/password/password_tools.html:42: trailing whitespace.
-[32m+[m[32m                unique value for a new account.[m[41m[m
-app/templates/password/password_tools.html:50: trailing whitespace.
-[32m+[m[32m                    aria-label="Generated password"[m[41m[m
-app/templates/password/password_tools.html:51: trailing whitespace.
-[32m+[m[32m                    placeholder="Generated password appears here"[m[41m[m
-app/templates/password/password_tools.html:72: trailing whitespace.
-[32m+[m[32m                        min="12"[m[41m[m
-app/templates/password/password_tools.html:74: trailing whitespace.
-[32m+[m[32m                        value="18"[m[41m[m
-app/templates/password/password_tools.html:77: trailing whitespace.
-[32m+[m[32m                    <strong id="passwordLengthValue">[m[41m[m
-app/templates/password/password_tools.html:78: trailing whitespace.
-[32m+[m[32m                        18[m[41m[m
-app/templates/password/password_tools.html:85: trailing whitespace.
-[32m+[m[32m                    <input id="useUppercase" type="checkbox" checked>[m[41m[m
-app/templates/password/password_tools.html:90: trailing whitespace.
-[32m+[m[32m                    <input id="useLowercase" type="checkbox" checked>[m[41m[m
-app/templates/password/password_tools.html:95: trailing whitespace.
-[32m+[m[32m                    <input id="useNumbers" type="checkbox" checked>[m[41m[m
-app/templates/password/password_tools.html:100: trailing whitespace.
-[32m+[m[32m                    <input id="useSymbols" type="checkbox" checked>[m[41m[m
-app/templates/password/password_tools.html:105: trailing whitespace.
-[32m+[m[32m                    <input id="excludeAmbiguous" type="checkbox">[m[41m[m
-app/templates/password/password_tools.html:115: trailing whitespace.
-[32m+[m[32m                Generate in Browser[m[41m[m
-app/templates/password/password_tools.html:121: trailing whitespace.
-[32m+[m[32m                role="alert"[m[41m[m
-app/templates/password/password_tools.html:122: trailing whitespace.
-[32m+[m[32m                aria-live="polite"[m[41m[m
-app/templates/password/password_tools.html:126: trailing whitespace.
-[32m+[m[32m        <aside class="password-card password-guidance-card">[m[41m[m
-app/templates/password/password_tools.html:127: trailing whitespace.
-[32m+[m[32m            <h2>Use Passwords Safely</h2>[m[41m[m
-app/templates/password/password_tools.html:129: trailing whitespace.
-[32m+[m[32m            <ul class="password-guidance-list">[m[41m[m
-app/templates/password/password_tools.html:130: trailing whitespace.
-[32m+[m[32m                <li>Use a different password for every important account.</li>[m[41m[m
-app/templates/password/password_tools.html:131: trailing whitespace.
-[32m+[m[32m                <li>Prefer at least 14–18 characters.</li>[m[41m[m
-app/templates/password/password_tools.html:132: trailing whitespace.
-[32m+[m[32m                <li>Store passwords in a trusted password manager.</li>[m[41m[m
-app/templates/password/password_tools.html:133: trailing whitespace.
-[32m+[m[32m                <li>Enable multi-factor authentication where available.</li>[m[41m[m
-app/templates/password/password_tools.html:134: trailing whitespace.
-[32m+[m[32m                <li>Never share passwords or one-time verification codes.</li>[m[41m[m
-app/templates/password/password_tools.html:135: trailing whitespace.
-[32m+[m[32m            </ul>[m[41m[m
-app/templates/password/password_tools.html:137: trailing whitespace.
-[32m+[m[32m            <p class="password-guidance-warning">[m[41m[m
-app/templates/password/password_tools.html:138: trailing whitespace.
-[32m+[m[32m                PhishGuard will never ask you to enter a Google, banking,[m[41m[m
-app/templates/password/password_tools.html:139: trailing whitespace.
-[32m+[m[32m                college, workplace or other third-party password.[m[41m[m
-app/templates/password/password_tools.html:141: trailing whitespace.
-[32m+[m[32m        </aside>[m[41m[m
-app/templates/password/password_tools.html:144: trailing whitespace.
-[32m+[m[32m{% endblock %}[m[41m[m
-scripts/predeploy_check.ps1:91: new blank line at EOF.
