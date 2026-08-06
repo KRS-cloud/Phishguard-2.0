@@ -281,7 +281,15 @@
             {% endif %}
         {% endwith %}
 
+        <!-- Notice Banner: Placed directly above main landing/page content -->
+        <div class="container" style="margin-top: 20px;">
+            <div style="background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; padding: 12px; margin-bottom: 20px; border-radius: 6px; text-align: center; font-size: 0.9rem;">
+                <strong>Notice:</strong> PhishGuard is an open-source educational cybersecurity tool built for threat analysis. This site does not request sensitive financial data or mimic third-party services.
+            </div>
+        </div>
+
         {% block content %}
+        {% block login_card %}{% endblock %}
         {% endblock %}
     </main>
 
