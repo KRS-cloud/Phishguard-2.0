@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 
 from flask import (
@@ -61,9 +62,11 @@ def security():
 
 @main_bp.route("/google590769cadd41dffa.html")
 def google_verification():
-    """Serve Google Search Console ownership verification file from static directory."""
-
-    return send_from_directory(current_app.static_folder, "google590769cadd41dffa.html")
+    file_path = os.path.join(current_app.static_folder, "google590769cadd41dffa.html")
+    if os.path.exists(file_path):
+        with open(file_path, "r") as f:
+            return f.read(), 200, {"Content-Type": "text/html"}
+    return "Verification file missing", 404
 
 
 @main_bp.route("/robots.txt")
