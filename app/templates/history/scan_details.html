@@ -31,7 +31,13 @@
                     {{ scan.scan_type }} Security Report
                 </span>
 
-                <h1>{{ scan.prediction }}</h1>
+                <h1>
+                    {% if scan.prediction == "Safe" %}
+                        Low Risk Indicators
+                    {% else %}
+                        {{ scan.prediction }}
+                    {% endif %}
+                </h1>
 
                 <p>{{ scan.input_value }}</p>
             </div>
@@ -118,7 +124,7 @@
             <form
                 method="POST"
                 action="{{ url_for('history.delete_scan', scan_id=scan.id) }}"
-                onsubmit="return confirm('Delete this scan report permanently?');"
+                data-confirm="Delete this scan report permanently?"
             >
                 <input
                     type="hidden"

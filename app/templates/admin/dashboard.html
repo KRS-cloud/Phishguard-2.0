@@ -288,7 +288,8 @@
                                     </div>
 
                                     <p>
-                                        {{ scan.input_value }}
+                                        Scan #{{ scan.id }} · saved input summary
+                                        hidden from the admin activity feed
                                     </p>
 
                                 </div>
@@ -304,7 +305,11 @@
                                         warning
                                     {% endif %}"
                                 >
-                                    {{ scan.prediction }}
+                                    {% if scan.prediction == "Safe" %}
+                                        Low Risk
+                                    {% else %}
+                                        {{ scan.prediction }}
+                                    {% endif %}
                                 </span>
 
                             </article>

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Access Denied | PhishGuard{% endblock %}
+
+{% block content %}
+<section class="error-page">
+    <div>
+        <h1>403</h1>
+        <h2>Access denied</h2>
+        <p>You do not have permission to access this resource.</p>
+        <a class="button button-primary" href="{{ url_for('main.home') }}">
+            Return Home
+        </a>
+    </div>
+</section>
+{% endblock %}

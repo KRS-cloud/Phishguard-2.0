@@ -89,16 +89,73 @@ def is_ip_address(hostname):
         return False
 
 
+def is_valid_hostname(hostname):
+    """Validate an IP address or DNS-style hostname."""
+
+    if not hostname or len(hostname) > 253:
+        return False
+
+    if is_ip_address(hostname):
+        return True
+
+    try:
+        ascii_hostname = hostname.encode("idna").decode("ascii")
+    except UnicodeError:
+        return False
+
+    if "." not in ascii_hostname:
+        return False
+
+    labels = ascii_hostname.split(".")
+
+    return all(
+        1 <= len(label) <= 63
+        and not label.startswith("-")
+        and not label.endswith("-")
+        and re.fullmatch(r"[A-Za-z0-9-]+", label) is not None
+        for label in labels
+    )
+
+
 def extract_url_features(url):
     """
     Extract understandable phishing-related URL features.
     """
 
     normalized_url = normalize_url(url)
-    parsed_url = urlparse(normalized_url)
 
-    hostname = parsed_url.hostname or ""
-    hostname = hostname.lower()
+    if any(
+        character.isspace() or ord(character) < 32
+        for character in normalized_url
+    ):
+        raise ValueError(
+            "The submitted URL contains invalid whitespace or control characters."
+        )
+
+    try:
+        parsed_url = urlparse(normalized_url)
+        hostname = (parsed_url.hostname or "").lower()
+    except ValueError as error:
+        raise ValueError(
+            "The submitted URL is malformed."
+        ) from error
+
+    if parsed_url.scheme.lower() not in {"http", "https"}:
+        raise ValueError(
+            "Only HTTP and HTTPS website URLs can be analyzed."
+        )
+
+    if not is_valid_hostname(hostname):
+        raise ValueError(
+            "The submitted URL does not contain a valid website hostname."
+        )
+
+    try:
+        port = parsed_url.port
+    except ValueError as error:
+        raise ValueError(
+            "The submitted URL contains an invalid network port."
+        ) from error
 
     path = parsed_url.path.lower()
     query = parsed_url.query.lower()
@@ -164,7 +221,7 @@ def extract_url_features(url):
         "is_shortened_url": hostname in SHORTENER_DOMAINS,
         "suspicious_tld": domain_extension in SUSPICIOUS_TLDS,
         "has_punycode": "xn--" in hostname,
-        "has_port": parsed_url.port is not None,
+        "has_port": port is not None,
         "has_encoded_characters": bool(
             re.search(r"%[0-9a-fA-F]{2}", normalized_url)
         ),

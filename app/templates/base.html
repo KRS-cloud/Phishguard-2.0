@@ -7,6 +7,11 @@
         name="csrf-token"
         content="{{ csrf_token() }}">
     <meta name="description" content="PhishGuard AI and ML cybersecurity platform">
+    {% if current_user.is_authenticated or request.blueprint in ['auth', 'admin'] %}
+        <meta name="robots" content="noindex, nofollow, noarchive">
+    {% else %}
+        <meta name="robots" content="index, follow">
+    {% endif %}
 
     <title>
         {% block title %}
@@ -23,7 +28,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/assistant.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/password.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-    
+
 </head>
 
 <body>
@@ -244,6 +249,19 @@
 
     <!-- Main Content Area -->
     <main class="page-shell">
+        <div class="project-trust-strip">
+            <div class="container project-trust-content">
+                <span>
+                    Defensive student cybersecurity project by Pankaj Pawar.
+                    Never enter a password from another service into an analyzer.
+                </span>
+
+                <a href="{{ url_for('main.security') }}">
+                    Safe-use guidance
+                </a>
+            </div>
+        </div>
+
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div class="container flash-container">
@@ -277,6 +295,18 @@
                     Intelligent analysis for safer digital decisions.
                 </p>
             </div>
+
+            <nav class="footer-links" aria-label="Project information">
+                <a href="{{ url_for('main.about') }}">About</a>
+                <a href="{{ url_for('main.privacy') }}">Privacy</a>
+                <a href="{{ url_for('main.security') }}">Security</a>
+                <a
+                    href="https://github.com/KRS-cloud/Phishguard-2.0"
+                    rel="external noreferrer"
+                >
+                    Source Code
+                </a>
+            </nav>
 
             <div class="footer-credit">
                 <p>

@@ -1,10 +1,6 @@
-import os
-
-from dotenv import load_dotenv
+from flask import current_app
 from google import genai
 from google.genai import types
-
-load_dotenv()
 
 SYSTEM_INSTRUCTION = """
 You are PhishGuard AI Assistant.
@@ -158,9 +154,7 @@ def get_gemini_client():
     Create a Gemini API client.
     """
 
-    api_key = os.getenv(
-        "GEMINI_API_KEY"
-    )
+    api_key = current_app.config.get("GEMINI_API_KEY")
 
     if not api_key:
         raise RuntimeError(
@@ -174,11 +168,9 @@ def get_gemini_client():
 
 def generate_ai_response(
     message,
-    scan_context=None,
-    conversation=None,
 ):
     """
-    Generate a cybersecurity or general response using Gemini with conversation history.
+    Generate one cybersecurity or general response using Gemini.
     """
 
     if not message:
@@ -188,96 +180,10 @@ def generate_ai_response(
 
     client = get_gemini_client()
 
-    context = ""
-    if scan_context:
-        context = f"""
-The user is asking about this PhishGuard scan.
-
-Scan Type:
-{scan_context.get("scan_type", "Unknown")}
-
-Input:
-{scan_context.get("input_value", "Unknown")}
-
-Prediction:
-{scan_context.get("prediction", "Unknown")}
-
-Risk Level:
-{scan_context.get("risk_level", "Unknown")}
-
-Risk Score:
-{scan_context.get("risk_score", "Unknown")}
-
-Confidence:
-{scan_context.get("confidence", "Unknown")}
-
-Existing PhishGuard explanation:
-{scan_context.get("explanation", "Not available")}
-
-Explain this scan using this structure:
-
-Result:
-- State the prediction.
-- State the risk level.
-- State the risk score.
-- State confidence if available.
-
-Why this result:
-- Explain the most important security indicators.
-- Keep each explanation simple.
-
-What the user should do:
-1. Give practical next steps.
-2. Include safety precautions.
-
-Do not repeat the same information unnecessarily.
-"""
-
-    conversation_text = ""
-
-    if conversation:
-
-        conversation_lines = []
-
-        for item in conversation[:-1]:
-
-            role = item.get(
-                "role",
-                "user",
-            )
-
-            text = item.get(
-                "message",
-                "",
-            )
-
-            if not text:
-                continue
-
-            speaker = (
-                "User"
-                if role == "user"
-                else "Assistant"
-            )
-
-            conversation_lines.append(
-                f"{speaker}: {text}"
-            )
-
-        if conversation_lines:
-
-            conversation_text = (
-                "Recent conversation:\n\n"
-                + "\n".join(
-                    conversation_lines
-                )
-                + "\n\n"
-            )
-
-    prompt = f"{conversation_text}{context}Current user message: {message}"
+    prompt = f"Current user message: {message}"
 
     response = client.models.generate_content(
-        model="gemini-3.6-flash",
+        model=current_app.config["GEMINI_MODEL"],
         contents=prompt,
         config=types.GenerateContentConfig(
             system_instruction=SYSTEM_INSTRUCTION,

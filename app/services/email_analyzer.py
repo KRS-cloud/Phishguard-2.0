@@ -320,7 +320,7 @@ def build_email_recommendations(
     else:
         recommendations.extend(
             [
-                "The message appears structurally safe, but continue carefully.",
+                "No major indicators were found, but continue carefully.",
                 "Verify unexpected requests before sharing sensitive information.",
                 "Check the sender address and linked domains before taking action.",
             ]

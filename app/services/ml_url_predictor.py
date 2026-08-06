@@ -1,3 +1,4 @@
+import hashlib
 from pathlib import Path
 
 import joblib
@@ -13,6 +14,8 @@ MODEL_PATH = (
     / "trained_models"
     / "url_phishing_model.joblib"
 )
+
+MODEL_HASH_PATH = MODEL_PATH.with_suffix(".sha256")
 
 _model_package = None
 
@@ -34,6 +37,34 @@ def load_model():
         raise FileNotFoundError(
             "The trained URL phishing model was not found. "
             "Run: python training/train_url_model.py"
+        )
+
+    if not MODEL_HASH_PATH.exists():
+        raise FileNotFoundError(
+            "The trained model checksum was not found. "
+            "Run: python training/train_url_model.py"
+        )
+
+    hash_parts = MODEL_HASH_PATH.read_text(
+        encoding="utf-8"
+    ).strip().split()
+
+    if len(hash_parts) != 1 or len(hash_parts[0]) != 64:
+        raise ValueError(
+            "The trained model checksum file is invalid."
+        )
+
+    expected_hash = hash_parts[0].lower()
+
+    digest = hashlib.sha256()
+
+    with MODEL_PATH.open("rb") as model_file:
+        for chunk in iter(lambda: model_file.read(1024 * 1024), b""):
+            digest.update(chunk)
+
+    if digest.hexdigest() != expected_hash:
+        raise ValueError(
+            "The trained URL model failed its integrity check."
         )
 
     _model_package = joblib.load(MODEL_PATH)

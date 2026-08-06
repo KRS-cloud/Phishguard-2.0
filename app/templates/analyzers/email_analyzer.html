@@ -98,6 +98,17 @@
                         Analyze Email
                     </button>
                 </form>
+
+                <div class="analyzer-notice">
+                    <span>🔒</span>
+
+                    <p>
+                        The sender, subject and email body are analyzed for
+                        this request but are not retained in scan history.
+                        Only a generic label and the resulting findings are
+                        saved. Never paste credentials or confidential data.
+                    </p>
+                </div>
             </section>
 
             <aside class="analysis-guide">
@@ -126,7 +137,13 @@
                             Email Analysis Result
                         </span>
 
-                        <h2>{{ result.prediction }}</h2>
+                        <h2>
+                            {% if result.prediction == "Safe" %}
+                                Low Risk Indicators
+                            {% else %}
+                                {{ result.prediction }}
+                            {% endif %}
+                        </h2>
 
                         <p>
                             The submitted email received a

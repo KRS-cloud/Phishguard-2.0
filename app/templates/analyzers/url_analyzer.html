@@ -59,8 +59,7 @@
                         >
 
                         <small class="form-help">
-                            Example: google.com or
-                            https://example.com/login
+                            Example: example.com or https://example.com/page
                         </small>
                     </div>
 
@@ -76,9 +75,11 @@
                     <span>🛡️</span>
 
                     <p>
-                        PhishGuard analyzes the URL structure. A safe
-                        result cannot guarantee that all page content
-                        is trustworthy.
+                        PhishGuard does not visit the website. Scan history
+                        stores only the URL origin (for example,
+                        https://example.com), never its path, query string,
+                        fragment or embedded credentials. A low-risk result
+                        is not a guarantee of safety.
                     </p>
                 </div>
             </section>
@@ -110,7 +111,11 @@
                         </span>
 
                         <h2>
-                            {{ result.prediction }}
+                            {% if result.prediction == "Safe" %}
+                                Low Risk Indicators
+                            {% else %}
+                                {{ result.prediction }}
+                            {% endif %}
                         </h2>
 
                         <p>
@@ -186,12 +191,16 @@
                         <div class="ml-stat">
                             <span>ML Prediction</span>
                             <strong>
-                                {{ result.ml_result.prediction }}
+                                {% if result.ml_result.prediction == "Safe" %}
+                                    Low Risk Indicators
+                                {% else %}
+                                    {{ result.ml_result.prediction }}
+                                {% endif %}
                             </strong>
                         </div>
 
                         <div class="ml-stat">
-                            <span>ML Safe Probability</span>
+                            <span>ML Low-Risk Probability</span>
                             <strong>
                                 {{ result.ml_result.safe_probability }}%
                             </strong>
@@ -286,12 +295,13 @@
                         data-explain-url="{{ url_for('main.explain_scan') }}"
                         data-assistant-url="{{ url_for('main.assistant') }}"
                     >
-                        Explain with AI
+                        Explain Result
                     </button>
 
                     <p class="ai-explain-note">
-                        Get a simple explanation of why PhishGuard
-                        classified this URL this way.
+                        Build a plain-language explanation locally from the
+                        scan findings. This button does not send the URL to
+                        Gemini.
                     </p>
                 </div>
 

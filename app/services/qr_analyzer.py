@@ -1,7 +1,9 @@
 import re
+from io import BytesIO
 
 import cv2
 import numpy as np
+from PIL import Image, UnidentifiedImageError
 
 from app.services.url_analyzer import analyze_url
 
@@ -12,6 +14,15 @@ ALLOWED_IMAGE_EXTENSIONS = {
     "jpeg",
     "webp",
 }
+
+ALLOWED_IMAGE_FORMATS = {
+    "JPEG",
+    "PNG",
+    "WEBP",
+}
+
+MAX_IMAGE_DIMENSION = 4096
+MAX_IMAGE_PIXELS = 16_000_000
 
 
 def get_file_extension(filename):
@@ -69,6 +80,31 @@ def decode_qr_image(file_bytes):
     if not file_bytes:
         raise ValueError(
             "The uploaded image is empty."
+        )
+
+    try:
+        with Image.open(BytesIO(file_bytes)) as source_image:
+            image_format = (source_image.format or "").upper()
+            header_width, header_height = source_image.size
+
+    except (UnidentifiedImageError, OSError, ValueError) as error:
+        raise ValueError(
+            "The uploaded file is not a supported image."
+        ) from error
+
+    if image_format not in ALLOWED_IMAGE_FORMATS:
+        raise ValueError(
+            "Only PNG, JPG, JPEG, and WEBP images are supported."
+        )
+
+    if (
+        header_width > MAX_IMAGE_DIMENSION
+        or header_height > MAX_IMAGE_DIMENSION
+        or header_width * header_height > MAX_IMAGE_PIXELS
+    ):
+        raise ValueError(
+            "The image dimensions are too large. Use an image no larger "
+            "than 4096 × 4096 pixels."
         )
 
     image_array = np.frombuffer(

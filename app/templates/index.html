@@ -18,9 +18,10 @@
             </h1>
 
             <p>
-                PhishGuard combines machine learning, security rules
-                and AI-generated explanations to analyze URLs, emails,
-                QR codes and password security.
+                PhishGuard is a defensive B.Tech project that combines
+                machine learning, explainable security rules and optional
+                AI guidance to identify warning indicators in content you
+                choose to submit.
             </p>
 
             <div class="hero-actions">
@@ -40,9 +41,9 @@
             </div>
 
             <div class="hero-benefits">
-                <span>✓ Structured risk reports</span>
-                <span>✓ AI explanations</span>
-                <span>✓ Personal scan history</span>
+                <span>✓ Passive analysis—links are not opened</span>
+                <span>✓ Educational risk indicators</span>
+                <span>✓ User-controlled scan history</span>
             </div>
         </div>
 
@@ -54,13 +55,13 @@
                 </span>
 
                 <span class="demo-label">
-                    Demo
+                    Fictional Training Example
                 </span>
             </div>
 
             <div class="preview-url">
-                <small>Submitted URL</small>
-                <strong>secure-login-example.com</strong>
+                <small>Reserved demonstration domain</small>
+                <strong>sample-risk.invalid</strong>
             </div>
 
             <div class="preview-result">
@@ -79,9 +80,8 @@
                     </h3>
 
                     <p>
-                        The completed analyzer will explain why the
-                        URL appears suspicious and what action the
-                        user should take.
+                        This fictional example demonstrates the report
+                        format. It is not a live website or a real scan.
                     </p>
                 </div>
             </div>
@@ -89,7 +89,7 @@
             <ul class="indicator-list">
                 <li>
                     <span>!</span>
-                    Login-related keyword detected
+                    Non-standard hostname pattern
                 </li>
 
                 <li>
@@ -99,7 +99,7 @@
 
                 <li>
                     <span>!</span>
-                    Possible impersonation pattern
+                    Reserved demonstration domain
                 </li>
             </ul>
         </div>
@@ -121,8 +121,9 @@
             </h2>
 
             <p>
-                Every analyzer will provide structured results,
+                Each analyzer provides an educational risk estimate,
                 detected warning signs and practical recommendations.
+                Results are decision-support—not proof that content is safe.
             </p>
         </div>
 
@@ -196,18 +197,18 @@
                     🔐
                 </div>
 
-                <h3>Password Security</h3>
+                <h3>Browser Password Generator</h3>
 
                 <p>
-                    Generate secure passwords and
-                    analyze password strength.
+                    Generate a random password entirely in your browser.
+                    Generated values are not sent to the server.
                 </p>
 
                 <a
                     href="{{ url_for('password.password_tools') }}"
                     class="button button-primary"
                 >
-                    Password Tools
+                    Open Generator
                 </a>
             </article>
 
@@ -234,27 +235,6 @@
 
         </div>
 
-        <div class="tools-grid">
-            {% for tool in tools %}
-                <article class="tool-card">
-                    <div class="tool-icon">
-                        {{ tool.icon }}
-                    </div>
-
-                    <h3>
-                        {{ tool.name }}
-                    </h3>
-
-                    <p>
-                        {{ tool.description }}
-                    </p>
-
-                    <span class="development-label">
-                        Under Development
-                    </span>
-                </article>
-            {% endfor %}
-        </div>
     </div>
 </section>
 
@@ -269,7 +249,7 @@
             </span>
 
             <h2>
-                How PhishGuard will analyze threats
+                How PhishGuard analyzes submitted content
             </h2>
         </div>
 
@@ -278,8 +258,8 @@
                 <span>01</span>
                 <h3>Validate</h3>
                 <p>
-                    Validate submitted URLs, email content,
-                    passwords and uploaded QR images.
+                    Validate submitted URLs, email content and uploaded
+                    QR images without visiting linked destinations.
                 </p>
             </article>
 
@@ -296,8 +276,8 @@
                 <span>03</span>
                 <h3>Explain</h3>
                 <p>
-                    Convert technical findings into a clear
-                    AI-generated explanation.
+                    Convert technical findings into a clear explanation.
+                    Optional assistant requests may use Google Gemini.
                 </p>
             </article>
 
@@ -329,7 +309,7 @@
 
             <p>
                 Detection, AI explanation, authentication, history
-                and interface logic will remain separated to make
+                and interface logic remain separated to make
                 the project easier to test and maintain.
             </p>
         </div>
@@ -337,9 +317,11 @@
         <div class="technology-list">
             <span>Python</span>
             <span>Flask</span>
-            <span>SQLite</span>
+            <span>PostgreSQL</span>
+            <span>Neon</span>
             <span>SQLAlchemy</span>
             <span>Scikit-learn</span>
+            <span>Brevo Email API</span>
             <span>HTML</span>
             <span>CSS</span>
             <span>JavaScript</span>

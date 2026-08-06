@@ -330,7 +330,7 @@ def build_recommendations(
     else:
         recommendations.extend(
             [
-                "The URL structure appears safe, but remain cautious.",
+                "No major structural indicators were found, but remain cautious.",
                 "Verify the website content before entering sensitive information.",
                 "Confirm that the domain belongs to the expected organization.",
             ]

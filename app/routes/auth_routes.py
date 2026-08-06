@@ -1,3 +1,4 @@
+import hashlib
 import re
 from datetime import datetime, timezone
 from urllib.parse import urljoin, urlparse
@@ -79,6 +80,9 @@ def validate_password(
     if len(password) < 8:
         return "Your password must contain at least 8 characters."
 
+    if len(password) > 128:
+        return "Your password must contain no more than 128 characters."
+
     if not any(character.isupper() for character in password):
         return "Your password must contain an uppercase letter."
 
@@ -116,6 +120,9 @@ def validate_registration_form(
     if not email:
         return "Please enter your email address."
 
+    if len(email) > 120:
+        return "Your email address is too long."
+
     if not is_valid_email(email):
         return "Please enter a valid email address."
 
@@ -136,12 +143,40 @@ def password_reset_email_key():
     ).strip().lower()
 
     if email:
-        return f"password-reset-email:{email}"
+        digest = hashlib.sha256(
+            email[:320].encode("utf-8")
+        ).hexdigest()
+
+        return f"password-reset-email:{digest}"
 
     return "password-reset-email:missing"
 
 
+def login_email_key():
+    """
+    Limit repeated login attempts against the same account.
+    """
+
+    email = request.form.get(
+        "email",
+        "",
+    ).strip().lower()
+
+    if email:
+        digest = hashlib.sha256(
+            email[:320].encode("utf-8")
+        ).hexdigest()
+
+        return f"login-email:{digest}"
+
+    return "login-email:missing"
+
+
 @auth_bp.route("/register", methods=["GET", "POST"])
+@limiter.limit(
+    "5 per hour",
+    methods=["POST"],
+)
 def register():
     """
     Create a new user account.
@@ -242,6 +277,15 @@ def register():
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
+@limiter.limit(
+    "20 per 15 minutes",
+    methods=["POST"],
+)
+@limiter.limit(
+    "10 per 15 minutes",
+    methods=["POST"],
+    key_func=login_email_key,
+)
 def login():
     """
     Authenticate a registered user.
@@ -266,6 +310,28 @@ def login():
         if not email or not password:
             flash(
                 "Please enter both your email and password.",
+                "error",
+            )
+
+            return render_template(
+                "auth/login.html",
+                email=email,
+            )
+
+        if len(email) > 120:
+            flash(
+                "The email or password is incorrect.",
+                "error",
+            )
+
+            return render_template(
+                "auth/login.html",
+                email="",
+            )
+
+        if len(password) > 128:
+            flash(
+                "The email or password is incorrect.",
                 "error",
             )
 
@@ -305,7 +371,7 @@ def login():
             remember=remember_me,
         )
 
-        login_time = datetime.now(timezone.utc)
+        login_time = datetime.now(timezone.utc).replace(tzinfo=None)
 
         user.last_login = login_time
         user.last_seen = login_time
@@ -362,7 +428,11 @@ def forgot_password():
             "",
         ).strip().lower()
 
-        if not email or not is_valid_email(email):
+        if (
+            not email
+            or len(email) > 120
+            or not is_valid_email(email)
+        ):
             flash(
                 "Please enter a valid email address.",
                 "error",
@@ -420,6 +490,10 @@ def forgot_password():
 @auth_bp.route(
     "/reset-password/<token>",
     methods=["GET", "POST"],
+)
+@limiter.limit(
+    "10 per hour",
+    methods=["POST"],
 )
 def reset_password(token):
     """

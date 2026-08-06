@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Security & Safe Use | PhishGuard AI & ML{% endblock %}
+
+{% block content %}
+<section class="legal-section">
+    <div class="container legal-layout">
+        <span class="eyebrow">Defensive Use Only</span>
+        <h1>Security and safe use</h1>
+
+        <div class="legal-card">
+            <h2>Never submit credentials</h2>
+            <p>
+                PhishGuard never asks for a Google, banking, college,
+                workplace or other third-party password. The sign-in form
+                accepts only a password created specifically for your
+                PhishGuard account.
+            </p>
+
+            <h2>Passive analysis</h2>
+            <p>
+                URL and QR analysis examines text and extracted indicators;
+                it does not open the destination. Email analysis examines
+                pasted text and does not access your mailbox.
+            </p>
+
+            <h2>Understand the result</h2>
+            <p>
+                Scores are educational estimates from rules and a
+                proof-of-concept model. False positives and false negatives
+                are possible. A low-risk result is not a guarantee of safety.
+            </p>
+
+            <h2>Responsible scope</h2>
+            <p>
+                Use the platform only with content you are authorized to
+                analyze. It is designed for awareness, classroom evaluation
+                and defensive learning—not impersonation, credential
+                collection or unauthorized testing.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

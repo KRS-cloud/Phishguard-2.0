@@ -58,7 +58,8 @@
                             </strong>
 
                             <small>
-                                PNG, JPG, JPEG, or WEBP — maximum 5 MB
+                                PNG, JPG, JPEG, or WEBP — maximum 5 MB and
+                                4096 × 4096 pixels
                             </small>
                         </label>
 
@@ -86,8 +87,9 @@
                     <span>🔒</span>
 
                     <p>
-                        The image is processed for QR decoding and is
-                        not permanently saved by this analyzer.
+                        The image is processed for QR decoding and is not
+                        saved. History stores only a URL origin or a generic
+                        text label—not the complete decoded content.
                     </p>
                 </div>
             </section>
@@ -116,7 +118,13 @@
                             QR Analysis Result
                         </span>
 
-                        <h2>{{ result.prediction }}</h2>
+                        <h2>
+                            {% if result.prediction == "Safe" %}
+                                Low Risk Indicators
+                            {% else %}
+                                {{ result.prediction }}
+                            {% endif %}
+                        </h2>
 
                         <p>
                             Decoded content type:

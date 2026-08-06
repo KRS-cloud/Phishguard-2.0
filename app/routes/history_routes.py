@@ -2,6 +2,7 @@ import csv
 import io
 from io import BytesIO
 import json
+from xml.sax.saxutils import escape
 
 from flask import (
     Blueprint,
@@ -38,6 +39,39 @@ history_bp = Blueprint(
     __name__,
     url_prefix="/history",
 )
+
+
+def pdf_text(value):
+    """Escape untrusted text before ReportLab parses its markup."""
+
+    return escape(str(value)).replace("\n", "<br/>")
+
+
+def safe_csv_cell(value):
+    """Prevent spreadsheet applications from executing CSV formulas."""
+
+    if value is None:
+        return ""
+
+    text = str(value)
+    trimmed = text.lstrip()
+
+    if (
+        text.startswith(("\t", "\r"))
+        or trimmed.startswith(("=", "+", "-", "@"))
+    ):
+        return f"'{text}"
+
+    return text
+
+
+def prediction_label(prediction):
+    """Return a cautious user-facing label for stored predictions."""
+
+    if prediction == "Safe":
+        return "Low Risk Indicators"
+
+    return prediction
 
 
 @history_bp.route("/")
@@ -300,7 +334,7 @@ def download_scan_pdf(scan_id):
         ],
         [
             "Prediction",
-            scan.prediction,
+            prediction_label(scan.prediction),
         ],
         [
             "Risk Level",
@@ -416,7 +450,7 @@ def download_scan_pdf(scan_id):
 
     story.append(
         Paragraph(
-            str(scan.input_value),
+            pdf_text(scan.input_value),
             body_style,
         )
     )
@@ -431,7 +465,7 @@ def download_scan_pdf(scan_id):
 
         story.append(
             Paragraph(
-                scan.explanation,
+                pdf_text(scan.explanation),
                 body_style,
             )
         )
@@ -450,7 +484,7 @@ def download_scan_pdf(scan_id):
         ):
             story.append(
                 Paragraph(
-                    f"{index}. {recommendation}",
+                    pdf_text(f"{index}. {recommendation}"),
                     body_style,
                 )
             )
@@ -546,15 +580,15 @@ def export_csv():
     for scan in scans:
 
         writer.writerow([
-            scan.id,
-            scan.scan_type,
-            scan.input_value,
-            scan.prediction,
-            scan.risk_level,
-            scan.risk_score,
-            scan.confidence or "",
-            scan.explanation or "",
-            scan.recommendations or "",
+            safe_csv_cell(scan.id),
+            safe_csv_cell(scan.scan_type),
+            safe_csv_cell(scan.input_value),
+            safe_csv_cell(prediction_label(scan.prediction)),
+            safe_csv_cell(scan.risk_level),
+            safe_csv_cell(scan.risk_score),
+            safe_csv_cell(scan.confidence),
+            safe_csv_cell(scan.explanation),
+            safe_csv_cell(scan.recommendations),
             (
                 scan.created_at.strftime(
                     "%Y-%m-%d %H:%M:%S"

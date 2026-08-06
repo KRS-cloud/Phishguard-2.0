@@ -191,6 +191,19 @@ document
         });
     });
 
+// Confirm destructive form submissions without inline scripts.
+document
+    .querySelectorAll("form[data-confirm]")
+    .forEach((form) => {
+        form.addEventListener("submit", (event) => {
+            const message = form.dataset.confirm;
+
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
+
 // QR Code file input display
 const qrImageInput = document.getElementById("qr_image");
 const selectedFileName = document.getElementById("selected-file-name");
@@ -258,45 +271,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const content = document.createElement("div");
         content.classList.add("message-content");
 
-        if (sender === "user") {
-            /*
-            User messages are always rendered as plain text.
-            This prevents user-entered HTML from being executed.
-            */
-
-            const paragraph = document.createElement("p");
-            paragraph.textContent = message;
-            content.appendChild(paragraph);
-        } else {
-            /*
-            AI responses support Markdown formatting.
-
-            Gemini can now use:
-            headings
-            bold text
-            numbered lists
-            bullet lists
-            code blocks
-            paragraphs
-            */
-
-            if (
-                typeof marked !== "undefined" &&
-                typeof DOMPurify !== "undefined"
-            ) {
-                const markdownHtml = marked.parse(message);
-                const safeHtml = DOMPurify.sanitize(markdownHtml);
-                content.innerHTML = safeHtml;
-            } else {
-                /*
-                Fallback if the Markdown library fails to load.
-                */
-
-                const paragraph = document.createElement("p");
-                paragraph.textContent = message;
-                content.appendChild(paragraph);
-            }
-        }
+        // Treat both user and model output as untrusted plain text.
+        const paragraph = document.createElement("p");
+        paragraph.textContent = message;
+        content.appendChild(paragraph);
 
         messageElement.appendChild(avatar);
         messageElement.appendChild(content);
@@ -366,6 +344,17 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    if (assistantChat) {
+        const storedExplanation = sessionStorage.getItem(
+            "phishguard_scan_explanation"
+        );
+
+        if (storedExplanation) {
+            sessionStorage.removeItem("phishguard_scan_explanation");
+            addChatMessage(storedExplanation, "assistant");
+        }
+    }
+
     const suggestionButtons = document.querySelectorAll(".suggestion-button");
 
     suggestionButtons.forEach(function (button) {
@@ -396,7 +385,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             explainScanButton.disabled = true;
-            explainScanButton.textContent = "Opening Assistant...";
+            explainScanButton.textContent = "Preparing Explanation...";
 
             try {
                 const response = await fetch("/assistant/explain-scan", {
@@ -416,12 +405,12 @@ document.addEventListener("DOMContentLoaded", function () {
             } catch (error) {
                 console.error(error);
                 explainScanButton.disabled = false;
-                explainScanButton.textContent = "Explain with AI";
+                explainScanButton.textContent = "Explain Result";
             }
         });
     }
 
-    // Password Security & Generator Handlers
+    // Browser-only password generator
     const generatePasswordButton = document.getElementById("generatePasswordButton");
     const generatedPassword = document.getElementById("generatedPassword");
     const copyPasswordButton = document.getElementById("copyPasswordButton");
@@ -434,42 +423,105 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    function secureRandomIndex(maximum) {
+        if (!window.crypto || !window.crypto.getRandomValues) {
+            throw new Error(
+                "Secure password generation is unavailable in this browser."
+            );
+        }
+
+        const acceptedRange = Math.floor(256 / maximum) * maximum;
+        const randomByte = new Uint8Array(1);
+
+        do {
+            window.crypto.getRandomValues(randomByte);
+        } while (randomByte[0] >= acceptedRange);
+
+        return randomByte[0] % maximum;
+    }
+
+    function secureChoice(characters) {
+        return characters[secureRandomIndex(characters.length)];
+    }
+
+    function secureShuffle(characters) {
+        for (let index = characters.length - 1; index > 0; index -= 1) {
+            const randomIndex = secureRandomIndex(index + 1);
+            const currentCharacter = characters[index];
+
+            characters[index] = characters[randomIndex];
+            characters[randomIndex] = currentCharacter;
+        }
+
+        return characters;
+    }
+
     if (generatePasswordButton) {
-        generatePasswordButton.addEventListener("click", async function () {
+        generatePasswordButton.addEventListener("click", function () {
             const errorElement = document.getElementById("generatorError");
+
             if (errorElement) {
                 errorElement.textContent = "";
             }
 
-            const options = {
-                length: passwordLength ? passwordLength.value : 16,
-                uppercase: document.getElementById("useUppercase")?.checked ?? true,
-                lowercase: document.getElementById("useLowercase")?.checked ?? true,
-                numbers: document.getElementById("useNumbers")?.checked ?? true,
-                symbols: document.getElementById("useSymbols")?.checked ?? true,
-                exclude_ambiguous: document.getElementById("excludeAmbiguous")?.checked ?? false
-            };
-
             try {
-                const response = await fetch(
-                    generatePasswordButton.dataset.generateUrl,
-                    {
-                        method: "POST",
-                        headers: getJsonPostHeaders(),
-                        body: JSON.stringify(options)
+                const ambiguousCharacters = "Il1O0o";
+                const excludeAmbiguous =
+                    document.getElementById("excludeAmbiguous")?.checked ?? false;
+
+                const selectedGroups = [];
+
+                if (document.getElementById("useUppercase")?.checked) {
+                    selectedGroups.push("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+                }
+
+                if (document.getElementById("useLowercase")?.checked) {
+                    selectedGroups.push("abcdefghijklmnopqrstuvwxyz");
+                }
+
+                if (document.getElementById("useNumbers")?.checked) {
+                    selectedGroups.push("0123456789");
+                }
+
+                if (document.getElementById("useSymbols")?.checked) {
+                    selectedGroups.push("!@#$%^&*()-_=+[]{}?");
+                }
+
+                if (selectedGroups.length === 0) {
+                    throw new Error("Select at least one character group.");
+                }
+
+                const groups = selectedGroups.map(function (group) {
+                    if (!excludeAmbiguous) {
+                        return group;
                     }
+
+                    return Array.from(group)
+                        .filter(function (character) {
+                            return !ambiguousCharacters.includes(character);
+                        })
+                        .join("");
+                });
+
+                const requestedLength = Number.parseInt(
+                    passwordLength ? passwordLength.value : "18",
+                    10
                 );
 
-                const data = await response.json();
+                const length = Math.max(12, Math.min(requestedLength, 64));
+                const combinedCharacters = groups.join("");
+                const passwordCharacters = groups.map(secureChoice);
 
-                if (!response.ok) {
-                    throw new Error(
-                        data.error || "Could not generate password."
+                while (passwordCharacters.length < length) {
+                    passwordCharacters.push(
+                        secureChoice(combinedCharacters)
                     );
                 }
 
                 if (generatedPassword) {
-                    generatedPassword.value = data.password;
+                    generatedPassword.value = secureShuffle(
+                        passwordCharacters
+                    ).join("");
                 }
             } catch (error) {
                 if (errorElement) {
@@ -485,115 +537,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            await navigator.clipboard.writeText(generatedPassword.value);
-
-            copyPasswordButton.textContent = "Copied";
-
-            setTimeout(function () {
-                copyPasswordButton.textContent = "Copy";
-            }, 1200);
-        });
-    }
-
-    const togglePasswordButton = document.getElementById("togglePasswordButton");
-    const passwordToCheck = document.getElementById("passwordToCheck");
-
-    if (togglePasswordButton && passwordToCheck) {
-        togglePasswordButton.addEventListener("click", function () {
-            const hidden = passwordToCheck.type === "password";
-
-            passwordToCheck.type = hidden ? "text" : "password";
-            togglePasswordButton.textContent = hidden ? "Hide" : "Show";
-        });
-    }
-
-    const checkPasswordButton = document.getElementById("checkPasswordButton");
-
-    if (checkPasswordButton && passwordToCheck) {
-        checkPasswordButton.addEventListener("click", async function () {
-            const password = passwordToCheck.value;
-
-            if (!password) {
-                return;
-            }
-
             try {
-                const response = await fetch(
-                    checkPasswordButton.dataset.checkUrl,
-                    {
-                        method: "POST",
-                        headers: getJsonPostHeaders(),
-                        body: JSON.stringify({
-                            password: password
-                        })
-                    }
-                );
+                await navigator.clipboard.writeText(generatedPassword.value);
 
-                const data = await response.json();
+                copyPasswordButton.textContent = "Copied";
 
-                const result = document.getElementById("passwordResult");
-                if (result) {
-                    result.classList.remove("hidden");
-                }
-
-                const strengthLabel = document.getElementById("strengthLabel");
-                if (strengthLabel) {
-                    strengthLabel.textContent = data.strength;
-                }
-
-                const strengthScore = document.getElementById("strengthScore");
-                if (strengthScore) {
-                    strengthScore.textContent = data.score + "/100";
-                }
-
-                const strengthMeterFill = document.getElementById("strengthMeterFill");
-                if (strengthMeterFill) {
-                    strengthMeterFill.style.width = data.score + "%";
-                }
-
-                const entropyValue = document.getElementById("entropyValue");
-                if (entropyValue) {
-                    entropyValue.textContent = data.entropy + " bits";
-                }
-
-                const crackTimeValue = document.getElementById("crackTimeValue");
-                if (crackTimeValue) {
-                    crackTimeValue.textContent = data.crack_time;
-                }
-
-                const warnings = document.getElementById("passwordWarnings");
-                if (warnings) {
-                    warnings.innerHTML = "";
-                    if (!data.warnings || data.warnings.length === 0) {
-                        const item = document.createElement("li");
-                        item.textContent = "No major weaknesses detected.";
-                        warnings.appendChild(item);
-                    } else {
-                        data.warnings.forEach(function (warning) {
-                            const item = document.createElement("li");
-                            item.textContent = warning;
-                            warnings.appendChild(item);
-                        });
-                    }
-                }
-
-                const suggestions = document.getElementById("passwordSuggestions");
-                if (suggestions) {
-                    suggestions.innerHTML = "";
-                    if (!data.suggestions || data.suggestions.length === 0) {
-                        const item = document.createElement("li");
-                        item.textContent = "Password meets the main strength checks.";
-                        suggestions.appendChild(item);
-                    } else {
-                        data.suggestions.forEach(function (suggestion) {
-                            const item = document.createElement("li");
-                            item.textContent = suggestion;
-                            suggestions.appendChild(item);
-                        });
-                    }
-                }
+                setTimeout(function () {
+                    copyPasswordButton.textContent = "Copy";
+                }, 1200);
             } catch (error) {
-                console.error("Error checking password strength:", error);
+                copyPasswordButton.textContent = "Copy failed";
             }
         });
     }

@@ -45,7 +45,7 @@
             </article>
 
             <article class="history-safe">
-                <span>Safe</span>
+                <span>Low Risk</span>
                 <strong>{{ safe_scans }}</strong>
             </article>
 
@@ -76,7 +76,7 @@
                         name="search"
                         type="text"
                         value="{{ search_query }}"
-                        placeholder="Search URL or submitted content"
+                        placeholder="Search saved scan summaries"
                     >
                 </div>
 
@@ -141,7 +141,7 @@
                                 selected
                             {% endif %}
                         >
-                            Safe
+                            Low Risk Indicators
                         </option>
 
                         <option
@@ -214,7 +214,11 @@
                                         <span
                                             class="prediction-badge prediction-{{ scan.prediction | lower }}"
                                         >
-                                            {{ scan.prediction }}
+                                            {% if scan.prediction == "Safe" %}
+                                                Low Risk Indicators
+                                            {% else %}
+                                                {{ scan.prediction }}
+                                            {% endif %}
                                         </span>
                                     </td>
 
@@ -248,7 +252,7 @@
                                             <form
                                                 method="POST"
                                                 action="{{ url_for('history.delete_scan', scan_id=scan.id) }}"
-                                                onsubmit="return confirm('Delete this scan record?');"
+                                                data-confirm="Delete this scan record?"
                                             >
                                                 <input
                                                     type="hidden"

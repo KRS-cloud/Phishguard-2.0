@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from pathlib import Path
 
-from flask import Flask
+from flask import Flask, request
 from flask_login import current_user
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -43,6 +43,68 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     limiter.init_app(app)
     csrf.init_app(app)
+
+    @app.after_request
+    def add_security_headers(response):
+        """Apply browser security and privacy headers."""
+
+        content_security_policy = [
+            "default-src 'self'",
+            "base-uri 'self'",
+            "connect-src 'self'",
+            "font-src 'self'",
+            "form-action 'self'",
+            "frame-ancestors 'none'",
+            "img-src 'self' data:",
+            "object-src 'none'",
+            "script-src 'self'",
+            "style-src 'self' 'unsafe-inline'",
+        ]
+
+        if request.is_secure:
+            content_security_policy.append("upgrade-insecure-requests")
+            response.headers.setdefault(
+                "Strict-Transport-Security",
+                "max-age=31536000; includeSubDomains",
+            )
+
+        response.headers.setdefault(
+            "Content-Security-Policy",
+            "; ".join(content_security_policy),
+        )
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        response.headers.setdefault("Referrer-Policy", "no-referrer")
+        response.headers.setdefault(
+            "Permissions-Policy",
+            "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
+        )
+        response.headers.setdefault("Cross-Origin-Opener-Policy", "same-origin")
+        response.headers.setdefault("Cross-Origin-Resource-Policy", "same-origin")
+
+        sensitive_blueprints = {
+            "admin",
+            "analyzer",
+            "auth",
+            "history",
+            "password",
+        }
+
+        if (
+            request.blueprint in sensitive_blueprints
+            or request.endpoint in {
+                "main.assistant",
+                "main.assistant_message",
+                "main.dashboard",
+                "main.explain_scan",
+            }
+        ):
+            response.headers["Cache-Control"] = (
+                "no-store, max-age=0, private"
+            )
+            response.headers["Pragma"] = "no-cache"
+
+        return response
 
     @app.before_request
     def update_user_activity():

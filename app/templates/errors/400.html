@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Invalid Request | PhishGuard{% endblock %}
+
+{% block content %}
+<section class="error-page">
+    <div>
+        <h1>400</h1>
+        <h2>Request could not be verified</h2>
+        <p>{{ message }}</p>
+        <a class="button button-primary" href="{{ url_for('main.home') }}">
+            Return Home
+        </a>
+    </div>
+</section>
+{% endblock %}

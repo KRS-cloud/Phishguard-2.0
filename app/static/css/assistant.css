@@ -35,6 +35,18 @@
     line-height: 1.7;
 }
 
+.assistant-privacy-notice {
+    max-width: 760px;
+    margin-top: 16px;
+    border: 1px solid rgba(216, 163, 79, 0.28);
+    border-radius: 12px;
+    background: rgba(216, 163, 79, 0.07);
+    color: var(--muted);
+    padding: 12px 14px;
+    font-size: 0.8rem;
+    line-height: 1.6;
+}
+
 .assistant-container {
     border: 1px solid var(--border);
     border-radius: 16px;
@@ -105,6 +117,8 @@
     border-radius: 14px;
 
     line-height: 1.65;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 
 .assistant-message .message-content p {

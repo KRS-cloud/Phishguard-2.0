@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}About | PhishGuard AI & ML{% endblock %}
+
+{% block content %}
+<section class="legal-section">
+    <div class="container legal-layout">
+        <span class="eyebrow">Project Transparency</span>
+        <h1>About PhishGuard</h1>
+
+        <div class="legal-card">
+            <p>
+                PhishGuard is a defensive B.Tech Computer Science project
+                developed by Pankaj Pawar to demonstrate phishing-risk
+                analysis with Python, Flask, security rules and a small
+                machine-learning model.
+            </p>
+
+            <h2>What it does</h2>
+            <p>
+                Registered users can inspect URLs, pasted email text and QR
+                images for warning indicators. The application presents an
+                educational risk estimate and explains the signals it found.
+                It does not visit a submitted website or claim to replace a
+                browser, antivirus product or professional security review.
+            </p>
+
+            <h2>Open implementation</h2>
+            <p>
+                The project source is publicly available for review on
+                <a href="https://github.com/KRS-cloud/Phishguard-2.0"
+                   rel="external noreferrer">GitHub</a>.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

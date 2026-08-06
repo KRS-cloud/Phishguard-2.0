@@ -1,4 +1,7 @@
 import re
+
+from flask import current_app
+
 from app.services.gemini_assistant import (
     generate_ai_response,
 )
@@ -197,8 +200,8 @@ def get_security_response(message):
                 "common words, and reused passwords. A password "
                 "manager can generate and store strong passwords. "
                 "Enable two-factor authentication for additional "
-                "protection. You can also use PhishGuard's Password "
-                "Strength Checker and Password Generator."
+                "protection. PhishGuard's browser-only generator can "
+                "create a random password without sending it to the server."
             ),
             "category": "password_security",
         }
@@ -322,8 +325,9 @@ def get_security_response(message):
             "reply": (
                 "PhishGuard combines cybersecurity rules and "
                 "machine learning to analyze URLs. It also provides "
-                "email analysis, QR analysis, password security "
-                "tools, authentication, scan history, and this "
+                "email analysis, QR analysis, password guidance, a "
+                "browser-only password generator, authentication, scan "
+                "history, and this "
                 "security assistant."
             ),
             "category": "phishguard",
@@ -389,9 +393,15 @@ def explain_scan_result(scan_result):
 
     sections = []
 
+    displayed_prediction = (
+        "Low Risk Indicators"
+        if str(prediction).lower() == "safe"
+        else prediction
+    )
+
     sections.append(
         (
-            f"PhishGuard classified this URL as {prediction} "
+            f"PhishGuard classified this URL as {displayed_prediction} "
             f"with a {risk_level} risk level."
         )
     )
@@ -481,7 +491,7 @@ def explain_scan_result(scan_result):
         sections.append(
             (
                 "No strong phishing indicators were detected by "
-                "this analysis. However, a Safe result is not a "
+                "this analysis. However, a low-risk result is not a "
                 "guarantee that a website is trustworthy."
             )
         )
@@ -496,8 +506,6 @@ def explain_scan_result(scan_result):
 
 def get_ai_security_response(
     message,
-    scan_context=None,
-    conversation=None,
 ):
     """
     Use Gemini when available and fall back to
@@ -508,8 +516,6 @@ def get_ai_security_response(
 
         reply = generate_ai_response(
             message=message,
-            scan_context=scan_context,
-            conversation=conversation,
         )
 
         return {
@@ -519,10 +525,9 @@ def get_ai_security_response(
         }
 
     except Exception as error:
-
-        print(
-            "Gemini Assistant Error:",
-            error,
+        current_app.logger.warning(
+            "Gemini assistant unavailable; using local fallback (%s).",
+            error.__class__.__name__,
         )
 
         fallback = get_security_response(

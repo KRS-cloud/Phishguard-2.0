@@ -1,4 +1,5 @@
 from pathlib import Path
+import hashlib
 import sys
 
 import joblib
@@ -42,6 +43,8 @@ MODEL_PATH = (
     MODEL_DIRECTORY
     / "url_phishing_model.joblib"
 )
+
+MODEL_HASH_PATH = MODEL_PATH.with_suffix(".sha256")
 
 
 def load_dataset():
@@ -231,6 +234,12 @@ def train_model():
     joblib.dump(
         model_package,
         MODEL_PATH,
+    )
+
+    digest = hashlib.sha256(MODEL_PATH.read_bytes()).hexdigest()
+    MODEL_HASH_PATH.write_text(
+        f"{digest}\n",
+        encoding="utf-8",
     )
 
     print(

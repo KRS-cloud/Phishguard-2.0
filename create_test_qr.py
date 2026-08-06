@@ -13,17 +13,18 @@ def create_qr(
     )
 
 
-create_qr(
-    "https://www.google.com",
-    "safe_qr.png",
-)
+if __name__ == "__main__":
+    create_qr(
+        "https://example.com",
+        "low_risk_example_qr.png",
+    )
 
-create_qr(
-    "http://verify-account-security.example.xyz/login",
-    "suspicious_qr.png",
-)
+    create_qr(
+        "http://training-risk.invalid/verify",
+        "risk_example_qr.png",
+    )
 
-create_qr(
-    "Welcome to PhishGuard AI and ML",
-    "text_qr.png",
-)
+    create_qr(
+        "PhishGuard defensive QR demonstration",
+        "text_example_qr.png",
+    )

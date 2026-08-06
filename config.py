@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -70,11 +71,23 @@ class Config:
     Base configuration shared by the entire application.
     """
 
+    APP_ENV = os.getenv(
+        "APP_ENV",
+        "development",
+    ).strip().lower()
+
+    IS_PRODUCTION = APP_ENV == "production"
+
     SECRET_KEY = os.getenv("SECRET_KEY")
 
-    if not SECRET_KEY:
+    if not SECRET_KEY or len(SECRET_KEY) < 32:
         raise RuntimeError(
-            "SECRET_KEY must be configured in .env."
+            "SECRET_KEY must be configured with at least 32 characters."
+        )
+
+    if IS_PRODUCTION and not os.getenv("DATABASE_URL"):
+        raise RuntimeError(
+            "DATABASE_URL must be configured in production."
         )
 
     SQLALCHEMY_DATABASE_URI = (
@@ -88,6 +101,15 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024
+    MAX_FORM_MEMORY_SIZE = 1024 * 1024
+    MAX_FORM_PARTS = 20
+
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+    GEMINI_MODEL = os.getenv(
+        "GEMINI_MODEL",
+        "gemini-3.6-flash",
+    )
 
     BREVO_API_KEY = os.getenv(
         "BREVO_API_KEY"
@@ -114,6 +136,11 @@ class Config:
         "http://127.0.0.1:5000",
     ).rstrip("/")
 
+    if IS_PRODUCTION and not APP_BASE_URL.startswith("https://"):
+        raise RuntimeError(
+            "APP_BASE_URL must use HTTPS in production."
+        )
+
     RATELIMIT_STORAGE_URI = os.getenv(
         "RATELIMIT_STORAGE_URI",
         "memory://",
@@ -123,18 +150,34 @@ class Config:
 
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
+    SESSION_COOKIE_NAME = "phishguard_session"
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=12)
 
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_SAMESITE = "Lax"
+    REMEMBER_COOKIE_NAME = "phishguard_remember"
+    REMEMBER_COOKIE_DURATION = timedelta(days=14)
 
-    SESSION_COOKIE_SECURE = get_boolean_environment_value(
-        "COOKIE_SECURE",
-        False,
+    SESSION_COOKIE_SECURE = (
+        IS_PRODUCTION
+        or get_boolean_environment_value(
+            "COOKIE_SECURE",
+            False,
+        )
     )
 
-    REMEMBER_COOKIE_SECURE = get_boolean_environment_value(
-        "COOKIE_SECURE",
-        False,
+    REMEMBER_COOKIE_SECURE = (
+        IS_PRODUCTION
+        or get_boolean_environment_value(
+            "COOKIE_SECURE",
+            False,
+        )
+    )
+
+    PREFERRED_URL_SCHEME = (
+        "https"
+        if IS_PRODUCTION
+        else "http"
     )
 
     TRUST_PROXY = (

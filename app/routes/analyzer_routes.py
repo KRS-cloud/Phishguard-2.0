@@ -1,9 +1,10 @@
 import json
+from urllib.parse import urlsplit, urlunsplit
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-from app.extensions import db
+from app.extensions import db, limiter
 from app.ml.email_features import extract_email_features
 from app.models import ScanHistory
 from app.services.qr_analyzer import analyze_qr_code, is_allowed_image
@@ -14,6 +15,46 @@ analyzer_bp = Blueprint(
     __name__,
     url_prefix="/analyze",
 )
+
+
+def authenticated_user_key():
+    """Use the signed-in account as the analyzer rate-limit key."""
+
+    return f"user:{current_user.id}"
+
+
+def url_history_summary(value):
+    """
+    Retain only a URL's origin in scan history.
+
+    User information, paths, query strings and fragments can contain
+    reset tokens or other secrets and are deliberately discarded.
+    """
+
+    try:
+        parsed = urlsplit(value)
+        hostname = parsed.hostname
+
+        if not hostname:
+            return "URL analyzed (details not retained)"
+
+        if ":" in hostname and not hostname.startswith("["):
+            hostname = f"[{hostname}]"
+
+        netloc = hostname
+
+        if parsed.port is not None:
+            netloc = f"{netloc}:{parsed.port}"
+
+        scheme = parsed.scheme.lower()
+
+        if scheme not in {"http", "https"}:
+            scheme = "https"
+
+        return urlunsplit((scheme, netloc, "", "", ""))
+
+    except (TypeError, ValueError):
+        return "URL analyzed (details not retained)"
 
 
 def add_risk(reasons, feature, message, score):
@@ -256,7 +297,7 @@ def build_email_recommendations(prediction, suspicious_links, features):
     else:
         recommendations.extend(
             [
-                "The message appears structurally safe, but continue carefully.",
+                "No major indicators were found, but continue carefully.",
                 "Verify unexpected requests before sharing sensitive information.",
                 "Check the sender address and linked domains before taking action.",
             ]
@@ -277,6 +318,11 @@ def build_email_recommendations(prediction, suspicious_links, features):
 
 @analyzer_bp.route("/url", methods=["GET", "POST"])
 @login_required
+@limiter.limit(
+    "30 per hour",
+    methods=["POST"],
+    key_func=authenticated_user_key,
+)
 def url_analyzer():
     """
     Display and process the URL phishing analyzer.
@@ -316,7 +362,7 @@ def url_analyzer():
         scan_record = ScanHistory(
             user_id=current_user.id,
             scan_type="URL",
-            input_value=result["normalized_url"],
+            input_value=url_history_summary(result["normalized_url"]),
             prediction=result["prediction"],
             risk_level=result["risk_level"],
             risk_score=result["risk_score"],
@@ -348,6 +394,11 @@ def url_analyzer():
 
 @analyzer_bp.route("/email", methods=["GET", "POST"])
 @login_required
+@limiter.limit(
+    "20 per hour",
+    methods=["POST"],
+    key_func=authenticated_user_key,
+)
 def email_analyzer():
     """
     Display and process the email phishing analyzer.
@@ -361,6 +412,19 @@ def email_analyzer():
         sender_email = request.form.get("sender_email", "").strip().lower()
         subject = request.form.get("subject", "").strip()
         email_body = request.form.get("email_body", "").strip()
+
+        if len(sender_email) > 200 or len(subject) > 300:
+            flash(
+                "The sender address or subject is too long.",
+                "error",
+            )
+            return render_template(
+                "analyzers/email_analyzer.html",
+                sender_email="",
+                subject="",
+                email_body=email_body,
+                result=None,
+            )
 
         if not email_body:
             flash("Please enter the suspicious email content.", "error")
@@ -394,12 +458,10 @@ def email_analyzer():
                 result=None,
             )
 
-        history_input = subject or email_body[:150]
-
         scan_record = ScanHistory(
             user_id=current_user.id,
             scan_type="Email",
-            input_value=history_input,
+            input_value="Email content (not retained)",
             prediction=result["prediction"],
             risk_level=result["risk_level"],
             risk_score=result["risk_score"],
@@ -433,6 +495,11 @@ def email_analyzer():
 
 @analyzer_bp.route("/qr", methods=["GET", "POST"])
 @login_required
+@limiter.limit(
+    "15 per hour",
+    methods=["POST"],
+    key_func=authenticated_user_key,
+)
 def qr_analyzer():
     """
     Upload, decode, and analyze a QR-code image.
@@ -495,9 +562,10 @@ def qr_analyzer():
                 uploaded_filename=uploaded_filename,
             )
 
-        history_input = result["decoded_text"]
-        if len(history_input) > 500:
-            history_input = history_input[:497] + "..."
+        if result["content_type"] == "URL":
+            history_input = url_history_summary(result["decoded_text"])
+        else:
+            history_input = "QR text content (not retained)"
 
         scan_record = ScanHistory(
             user_id=current_user.id,

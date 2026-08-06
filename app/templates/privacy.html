@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy | PhishGuard AI & ML{% endblock %}
+
+{% block content %}
+<section class="legal-section">
+    <div class="container legal-layout">
+        <span class="eyebrow">Plain-language Notice</span>
+        <h1>Privacy</h1>
+
+        <div class="legal-card">
+            <h2>Account information</h2>
+            <p>
+                PhishGuard stores the name and email address supplied during
+                registration, a one-way password hash, sign-in activity and
+                the user's saved scan-history summaries.
+            </p>
+
+            <h2>Analyzer submissions</h2>
+            <p>
+                The service processes content you intentionally submit. Do
+                not paste passwords, one-time codes, financial information,
+                private keys, confidential messages or other sensitive data.
+                QR images are decoded for analysis and are not intended to be
+                retained as uploaded files.
+            </p>
+
+            <h2>External services</h2>
+            <p>
+                Neon provides the hosted database, Brevo delivers account
+                recovery email, and Google Gemini may process questions sent
+                to the optional AI assistant. Analyzer results can be
+                generated without entering credentials from another service.
+            </p>
+
+            <h2>Control</h2>
+            <p>
+                Scan history belongs to the signed-in account. This student
+                deployment is for demonstration and evaluation, so users
+                should avoid submitting confidential or production data.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

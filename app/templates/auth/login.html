@@ -61,7 +61,7 @@
                 class="auth-form"
                 method="POST"
                 action="{{ url_for('auth.login', next=request.args.get('next')) }}"
-                autocomplete="off"
+                autocomplete="on"
                 novalidate
             >
                 <input
@@ -80,7 +80,7 @@
                         value="{{ email | default('') }}"
                         placeholder="Enter your email address"
                         maxlength="120"
-                        autocomplete="off"
+                        autocomplete="username"
                         required
                     >
                 </div>
@@ -96,7 +96,8 @@
                             name="password"
                             type="password"
                             placeholder="Enter your password"
-                            autocomplete="new-password"
+                            maxlength="128"
+                            autocomplete="current-password"
                             required
                         >
 
@@ -108,6 +109,11 @@
                             Show
                         </button>
                     </div>
+
+                    <small class="form-help">
+                        Enter only your PhishGuard password. Never use a
+                        Google, banking, college or workplace password here.
+                    </small>
                 </div>
 
                 <p class="auth-switch">
