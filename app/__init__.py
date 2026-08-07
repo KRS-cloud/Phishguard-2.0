@@ -102,7 +102,7 @@ def create_app(config_class=Config):
         )
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")
-        response.headers.setdefault("Referrer-Policy", "no-referrer")
+        response.headers.setdefault("Referrer-Policy", "same-origin")
         response.headers.setdefault(
             "Permissions-Policy",
             "camera=(), geolocation=(), microphone=(), payment=(), usb=()",

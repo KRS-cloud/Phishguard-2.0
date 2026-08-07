@@ -1,4 +1,11 @@
-from flask import flash, redirect, render_template, request, url_for
+from flask import (
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_wtf.csrf import CSRFError
 from werkzeug.exceptions import RequestEntityTooLarge
 
@@ -29,13 +36,26 @@ def register_error_handlers(app):
 
     @app.errorhandler(CSRFError)
     def csrf_error(error):
-        return render_template(
-            "errors/400.html",
-            message=(
-                "The form expired or could not be verified. "
-                "Refresh the page and try again."
+        current_app.logger.warning(
+            "CSRF validation failed: %s | path=%s | "
+            "host=%s | secure=%s | referrer=%r",
+            error.description,
+            request.path,
+            request.host,
+            request.is_secure,
+            request.referrer,
+        )
+
+        return (
+            render_template(
+                "errors/400.html",
+                message=(
+                    "The form expired or could not be verified. "
+                    "Refresh the page and try again."
+                ),
             ),
-        ), 400
+            400,
+        )
 
     @app.errorhandler(RequestEntityTooLarge)
     def file_too_large(error):
