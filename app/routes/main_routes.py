@@ -3,13 +3,13 @@ from datetime import datetime, timedelta
 
 from flask import (
     Blueprint,
+    Response,
     current_app,
     jsonify,
     render_template,
     request,
-    Response,
-    send_from_directory,
 )
+from flask_limiter.util import get_remote_address
 from flask_login import current_user, login_required
 
 from app.extensions import limiter
@@ -25,10 +25,18 @@ main_bp = Blueprint(
 )
 
 
-def assistant_user_key():
-    """Use the signed-in user as the assistant rate-limit key."""
+def assistant_request_key():
+    """
+    Rate-limit authenticated users by account and anonymous
+    visitors by IP address.
 
-    return f"assistant-user:{current_user.id}"
+    Authentication is NOT required to use the assistant.
+    """
+
+    if current_user.is_authenticated:
+        return f"assistant-user:{current_user.id}"
+
+    return f"assistant-guest:{get_remote_address()}"
 
 
 @main_bp.route("/")
@@ -62,7 +70,9 @@ def security():
 
 @main_bp.route("/google590769cadd41dffa.html")
 def google_verification():
-    file_path = os.path.join(current_app.static_folder, "google590769cadd41dffa.html")
+    file_path = os.path.join(
+        current_app.static_folder, "google590769cadd41dffa.html"
+    )
     if os.path.exists(file_path):
         with open(file_path, "r") as f:
             return f.read(), 200, {"Content-Type": "text/html"}
@@ -109,39 +119,27 @@ def dashboard():
     """
 
     scans = (
-        ScanHistory.query
-        .filter_by(user_id=current_user.id)
+        ScanHistory.query.filter_by(user_id=current_user.id)
         .order_by(ScanHistory.created_at.desc())
         .all()
     )
 
     total_scans = len(scans)
 
-    safe_scans = sum(
-        1
-        for scan in scans
-        if scan.prediction == "Safe"
-    )
+    safe_scans = sum(1 for scan in scans if scan.prediction == "Safe")
 
     suspicious_scans = sum(
-        1
-        for scan in scans
-        if scan.prediction == "Suspicious"
+        1 for scan in scans if scan.prediction == "Suspicious"
     )
 
-    phishing_scans = sum(
-        1
-        for scan in scans
-        if scan.prediction == "Phishing"
-    )
+    phishing_scans = sum(1 for scan in scans if scan.prediction == "Phishing")
 
     today = datetime.now().date()
 
     today_scans = sum(
         1
         for scan in scans
-        if scan.created_at
-        and scan.created_at.date() == today
+        if scan.created_at and scan.created_at.date() == today
     )
 
     recent_scans = scans[:8]
@@ -149,25 +147,18 @@ def dashboard():
     recent_alerts = [
         scan
         for scan in scans
-        if scan.prediction in [
-            "Suspicious",
-            "Phishing",
-        ]
+        if scan.prediction in ["Suspicious", "Phishing"]
     ][:5]
 
     last_7_days = []
 
     for days_ago in range(6, -1, -1):
-
-        day = today - timedelta(
-            days=days_ago
-        )
+        day = today - timedelta(days=days_ago)
 
         count = sum(
             1
             for scan in scans
-            if scan.created_at
-            and scan.created_at.date() == day
+            if scan.created_at and scan.created_at.date() == day
         )
 
         last_7_days.append({
@@ -177,10 +168,7 @@ def dashboard():
         })
 
     max_daily_scans = max(
-        [
-            item["count"]
-            for item in last_7_days
-        ],
+        [item["count"] for item in last_7_days],
         default=1,
     )
 
@@ -196,10 +184,7 @@ def dashboard():
         "Use unique passwords and enable two-factor authentication.",
     ]
 
-    security_tip = security_tips[
-        today.toordinal()
-        % len(security_tips)
-    ]
+    security_tip = security_tips[today.toordinal() % len(security_tips)]
 
     return render_template(
         "dashboard.html",
@@ -217,11 +202,11 @@ def dashboard():
 
 
 @main_bp.route("/assistant")
-@login_required
 def assistant():
     """
-    Render the AI Assistant interface.
+    Render the public general-purpose AI Assistant.
     """
+
     return render_template("assistant.html")
 
 
@@ -229,51 +214,59 @@ def assistant():
     "/assistant/message",
     methods=["POST"],
 )
-@login_required
 @limiter.limit(
     "20 per hour",
     methods=["POST"],
-    key_func=assistant_user_key,
+    key_func=assistant_request_key,
 )
 def assistant_message():
     """
     Handle one AI Assistant question without retaining chat history.
     """
 
-    data = request.get_json(
-        silent=True
-    ) or {}
+    data = request.get_json(silent=True) or {}
 
     if not isinstance(data, dict):
-        return jsonify({
-            "reply": "A JSON object containing a message is required.",
-            "source": "local",
-        }), 400
+        return (
+            jsonify({
+                "reply": "A JSON object containing a message is required.",
+                "source": "local",
+            }),
+            400,
+        )
 
-    message_value = data.get(
-        "message",
-        ""
-    )
+    message_value = data.get("message", "")
 
     if not isinstance(message_value, str):
-        return jsonify({
-            "reply": "Please enter a valid text question.",
-            "source": "local",
-        }), 400
+        return (
+            jsonify({
+                "reply": "Please enter a valid text question.",
+                "source": "local",
+            }),
+            400,
+        )
 
     message = message_value.strip()
 
     if not message:
-        return jsonify({
-            "reply": "Please enter a message.",
-            "source": "local",
-        }), 400
+        return (
+            jsonify({
+                "reply": "Please enter a message.",
+                "source": "local",
+            }),
+            400,
+        )
 
     if len(message) > 500:
-        return jsonify({
-            "reply": "Questions must contain no more than 500 characters.",
-            "source": "local",
-        }), 400
+        return (
+            jsonify({
+                "reply": (
+                    "Questions must contain no more than 500 characters."
+                ),
+                "source": "local",
+            }),
+            400,
+        )
 
     result = get_ai_security_response(
         message=message,
@@ -286,11 +279,10 @@ def assistant_message():
     "/assistant/explain-scan",
     methods=["POST"],
 )
-@login_required
 @limiter.limit(
     "30 per hour",
     methods=["POST"],
-    key_func=assistant_user_key,
+    key_func=assistant_request_key,
 )
 def explain_scan():
     """
@@ -299,17 +291,25 @@ def explain_scan():
     data = request.get_json(silent=True) or {}
 
     if not isinstance(data, dict):
-        return jsonify({
-            "reply": "A JSON object containing a scan result is required.",
-            "category": "scan_explanation",
-        }), 400
+        return (
+            jsonify({
+                "reply": (
+                    "A JSON object containing a scan result is required."
+                ),
+                "category": "scan_explanation",
+            }),
+            400,
+        )
     supplied_result = data.get("scan_result")
 
     if not isinstance(supplied_result, dict):
-        return jsonify({
-            "reply": "A valid scan result is required.",
-            "category": "scan_explanation",
-        }), 400
+        return (
+            jsonify({
+                "reply": "A valid scan result is required.",
+                "category": "scan_explanation",
+            }),
+            400,
+        )
 
     supplied_reasons = supplied_result.get("reasons", [])
 

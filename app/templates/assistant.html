@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-AI Security Assistant | PhishGuard
+AI Assistant | PhishGuard
 {% endblock %}
 
 {% block content %}
@@ -14,18 +14,18 @@ AI Security Assistant | PhishGuard
         </span>
 
         <h1>
-            AI Security Assistant
+            AI Assistant
         </h1>
 
         <div class="assistant-status">
             <span class="assistant-status-dot"></span>
-            AI-powered cybersecurity guidance
+            General-purpose AI with cybersecurity expertise
         </div>
 
         <p>
-            Ask questions about phishing,
-            suspicious websites, emails,
-            QR codes, passwords and online safety.
+            Ask about programming, AI, machine learning,
+            mathematics, science, education, technology,
+            cybersecurity, writing and general questions.
         </p>
 
         <div class="assistant-privacy-notice">
@@ -51,11 +51,14 @@ AI Security Assistant | PhishGuard
                         PhishGuard Assistant
                     </span>
 
-                    <p>
-                        Hello! I'm your AI Security Assistant.
-                        Ask me anything about phishing or
-                        cybersecurity.
-                    </p>
+                    <div class="message-body">
+                        <p>
+                            Hello! I'm PhishGuard AI Assistant.
+                            Ask me about programming, AI, machine learning,
+                            cybersecurity, education, science, technology
+                            or general topics.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -64,33 +67,33 @@ AI Security Assistant | PhishGuard
             <button
                 type="button"
                 class="suggestion-button"
-                data-question="What is phishing?"
+                data-question="Explain machine learning in simple words."
             >
-                What is phishing?
+                Learn Machine Learning
             </button>
 
             <button
                 type="button"
                 class="suggestion-button"
-                data-question="How can I identify a phishing email?"
+                data-question="Help me write a Python program."
             >
-                Detect phishing email
+                Python Help
             </button>
 
             <button
                 type="button"
                 class="suggestion-button"
-                data-question="Are QR codes safe?"
+                data-question="How can I identify a phishing website?"
             >
-                QR code safety
+                Cybersecurity
             </button>
 
             <button
                 type="button"
                 class="suggestion-button"
-                data-question="How do I create a strong password?"
+                data-question="Explain a difficult topic step by step."
             >
-                Password security
+                Study Assistant
             </button>
         </div>
 
@@ -101,7 +104,7 @@ AI Security Assistant | PhishGuard
             <input
                 type="text"
                 id="assistantInput"
-                placeholder="Ask a cybersecurity question..."
+                placeholder="Ask anything..."
                 autocomplete="off"
                 maxlength="500"
                 required

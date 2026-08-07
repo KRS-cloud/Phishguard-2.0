@@ -14,7 +14,7 @@
 
     <title>
         {% block title %}
-            PhishGuard AI & ML
+            PhishGuard
         {% endblock %}
     </title>
 
@@ -50,11 +50,11 @@
 
                 <span class="brand-details">
                     <strong>
-                        PhishGuard
+                        PhishGuard AI
                     </strong>
 
                     <small>
-                        AI & ML Security Platform
+                        Security Platform
                     </small>
                 </span>
             </a>
@@ -221,7 +221,7 @@
             </span>
 
             <strong>
-                PhishGuard
+                PhishGuard AI
             </strong>
         </a>
 
@@ -248,18 +248,6 @@
 
     <!-- Main Content Area -->
     <main class="page-shell">
-        <div class="project-trust-strip">
-            <div class="container project-trust-content">
-                <span>
-                    Defensive student cybersecurity project by college group team .
-                    Never enter a password from another service into an analyzer.
-                </span>
-
-                <a href="{{ url_for('main.security') }}">
-                    Safe-use guidance
-                </a>
-            </div>
-        </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -281,13 +269,6 @@
             {% endif %}
         {% endwith %}
 
-        <!-- Notice Banner: Placed directly above main landing/page content -->
-        <div class="container" style="margin-top: 20px;">
-            <div style="background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; padding: 12px; margin-bottom: 20px; border-radius: 6px; text-align: center; font-size: 0.9rem;">
-                <strong>Notice:</strong> PhishGuard is an open-source educational cybersecurity tool built for threat analysis. This site does not request sensitive financial data or mimic third-party services.
-            </div>
-        </div>
-
         {% block content %}
         {% block login_card %}{% endblock %}
         {% endblock %}
@@ -296,22 +277,30 @@
     <!-- Footer -->
     <footer class="site-footer page-shell-footer">
         <div class="container footer-content">
+
             <div>
-                <strong>PhishGuard AI & ML</strong>
+                <strong>PhishGuard</strong>
+
                 <p>
-                    Intelligent analysis for safer digital decisions.
+                    Cybersecurity analysis and AI-assisted guidance
+                    for safer digital decisions.
                 </p>
             </div>
 
-            <nav class="footer-links" aria-label="Project information">
-                <a href="{{ url_for('main.about') }}">About</a>
-                <a href="{{ url_for('main.privacy') }}">Privacy</a>
-                <a href="{{ url_for('main.security') }}">Security</a>
-                <a
-                    
-                    rel="external noreferrer"
-                >
-                    Source Code
+            <nav
+                class="footer-links"
+                aria-label="Project information"
+            >
+                <a href="{{ url_for('main.about') }}">
+                    About
+                </a>
+
+                <a href="{{ url_for('main.privacy') }}">
+                    Privacy
+                </a>
+
+                <a href="{{ url_for('main.security') }}">
+                    Security
                 </a>
             </nav>
 
@@ -319,10 +308,8 @@
                 <p>
                     B.Tech CSE AI & ML Project
                 </p>
-                <p>
-                    Developed by <strong>College Group Team</strong>
-                </p>
             </div>
+
         </div>
     </footer>
 

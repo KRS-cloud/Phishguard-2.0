@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from pathlib import Path
 
-from flask import Flask, request
+from flask import Flask, abort, request
 from flask_login import current_user
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -43,6 +43,34 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     limiter.init_app(app)
     csrf.init_app(app)
+
+    @app.before_request
+    def restrict_routes_during_security_review():
+        """
+        Temporarily expose only public informational pages while
+        the application is being reviewed by Google Safe Browsing.
+        """
+
+        if not app.config.get("REVIEW_MODE"):
+            return None
+
+        allowed_paths = {
+            "/",
+            "/about",
+            "/privacy",
+            "/security",
+            "/robots.txt",
+            "/.well-known/security.txt",
+            "/google590769cadd41dffa.html",
+        }
+
+        if request.path.startswith("/static/"):
+            return None
+
+        if request.path in allowed_paths:
+            return None
+
+        abort(404)
 
     @app.after_request
     def add_security_headers(response):

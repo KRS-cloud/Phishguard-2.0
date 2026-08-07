@@ -1,8 +1,9 @@
 import json
 from urllib.parse import urlsplit, urlunsplit
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required
+from flask import Blueprint, flash, render_template, request
+from flask_limiter.util import get_remote_address
+from flask_login import current_user
 
 from app.extensions import db, limiter
 from app.ml.email_features import extract_email_features
@@ -17,10 +18,68 @@ analyzer_bp = Blueprint(
 )
 
 
-def authenticated_user_key():
-    """Use the signed-in account as the analyzer rate-limit key."""
+def analyzer_rate_limit_key():
+    """
+    Use the account ID for signed-in users and the client IP
+    address for anonymous visitors.
+    """
 
-    return f"user:{current_user.id}"
+    if current_user.is_authenticated:
+        return f"user:{current_user.id}"
+
+    return f"guest:{get_remote_address()}"
+
+
+def save_authenticated_scan(
+    scan_type,
+    input_value,
+    result,
+):
+    """
+    Save a scan only when the visitor is signed in.
+
+    Anonymous visitors receive the complete result, but no
+    database history record is created.
+    """
+
+    if not current_user.is_authenticated:
+        return False
+
+    scan_record = ScanHistory(
+        user_id=current_user.id,
+        scan_type=scan_type,
+        input_value=input_value,
+        prediction=result["prediction"],
+        risk_level=result["risk_level"],
+        risk_score=result["risk_score"],
+        confidence=result["confidence"],
+        explanation=result["explanation"],
+        recommendations=json.dumps(
+            result["recommendations"]
+        ),
+    )
+
+    try:
+        db.session.add(scan_record)
+        db.session.commit()
+
+        flash(
+            "Analysis completed and saved to your history.",
+            "success",
+        )
+
+        return True
+
+    except Exception:
+        db.session.rollback()
+
+        flash(
+            "The analysis completed, but it could not be saved "
+            "to your history.",
+            "warning",
+        )
+
+        return False
 
 
 def url_history_summary(value):
@@ -317,11 +376,10 @@ def build_email_recommendations(prediction, suspicious_links, features):
 
 
 @analyzer_bp.route("/url", methods=["GET", "POST"])
-@login_required
 @limiter.limit(
     "30 per hour",
     methods=["POST"],
-    key_func=authenticated_user_key,
+    key_func=analyzer_rate_limit_key,
 )
 def url_analyzer():
     """
@@ -359,31 +417,13 @@ def url_analyzer():
                 result=None,
             )
 
-        scan_record = ScanHistory(
-            user_id=current_user.id,
+        save_authenticated_scan(
             scan_type="URL",
-            input_value=url_history_summary(result["normalized_url"]),
-            prediction=result["prediction"],
-            risk_level=result["risk_level"],
-            risk_score=result["risk_score"],
-            confidence=result["confidence"],
-            explanation=result["explanation"],
-            recommendations=json.dumps(result["recommendations"]),
+            input_value=url_history_summary(
+                result["normalized_url"]
+            ),
+            result=result,
         )
-
-        try:
-            db.session.add(scan_record)
-            db.session.commit()
-            flash(
-                "URL analysis completed and saved to your history.",
-                "success",
-            )
-        except Exception:
-            db.session.rollback()
-            flash(
-                "The analysis completed, but it could not be saved to history.",
-                "warning",
-            )
 
     return render_template(
         "analyzers/url_analyzer.html",
@@ -393,11 +433,10 @@ def url_analyzer():
 
 
 @analyzer_bp.route("/email", methods=["GET", "POST"])
-@login_required
 @limiter.limit(
     "20 per hour",
     methods=["POST"],
-    key_func=authenticated_user_key,
+    key_func=analyzer_rate_limit_key,
 )
 def email_analyzer():
     """
@@ -458,31 +497,11 @@ def email_analyzer():
                 result=None,
             )
 
-        scan_record = ScanHistory(
-            user_id=current_user.id,
+        save_authenticated_scan(
             scan_type="Email",
             input_value="Email content (not retained)",
-            prediction=result["prediction"],
-            risk_level=result["risk_level"],
-            risk_score=result["risk_score"],
-            confidence=result["confidence"],
-            explanation=result["explanation"],
-            recommendations=json.dumps(result["recommendations"]),
+            result=result,
         )
-
-        try:
-            db.session.add(scan_record)
-            db.session.commit()
-            flash(
-                "Email analysis completed and saved to your history.",
-                "success",
-            )
-        except Exception:
-            db.session.rollback()
-            flash(
-                "The analysis completed, but it could not be saved to history.",
-                "warning",
-            )
 
     return render_template(
         "analyzers/email_analyzer.html",
@@ -494,11 +513,10 @@ def email_analyzer():
 
 
 @analyzer_bp.route("/qr", methods=["GET", "POST"])
-@login_required
 @limiter.limit(
     "15 per hour",
     methods=["POST"],
-    key_func=authenticated_user_key,
+    key_func=analyzer_rate_limit_key,
 )
 def qr_analyzer():
     """
@@ -567,31 +585,11 @@ def qr_analyzer():
         else:
             history_input = "QR text content (not retained)"
 
-        scan_record = ScanHistory(
-            user_id=current_user.id,
+        save_authenticated_scan(
             scan_type="QR",
             input_value=history_input,
-            prediction=result["prediction"],
-            risk_level=result["risk_level"],
-            risk_score=result["risk_score"],
-            confidence=result["confidence"],
-            explanation=result["explanation"],
-            recommendations=json.dumps(result["recommendations"]),
+            result=result,
         )
-
-        try:
-            db.session.add(scan_record)
-            db.session.commit()
-            flash(
-                "QR analysis completed and saved to your history.",
-                "success",
-            )
-        except Exception:
-            db.session.rollback()
-            flash(
-                "The QR analysis completed, but it could not be saved to history.",
-                "warning",
-            )
 
     return render_template(
         "analyzers/qr_analyzer.html",

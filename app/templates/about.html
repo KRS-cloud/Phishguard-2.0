@@ -1,37 +1,65 @@
 {% extends "base.html" %}
 
-{% block title %}About | PhishGuard AI & ML{% endblock %}
+{% block title %}
+About | PhishGuard
+{% endblock %}
 
 {% block content %}
+
 <section class="legal-section">
+
     <div class="container legal-layout">
-        <span class="eyebrow">Project Transparency</span>
-        <h1>About PhishGuard</h1>
+
+        <span class="eyebrow">
+            Project Overview
+        </span>
+
+        <h1>
+            About PhishGuard
+        </h1>
 
         <div class="legal-card">
+
             <p>
-                PhishGuard is a defensive B.Tech Computer Science project
-                developed by Pankaj Pawar to demonstrate phishing-risk
-                analysis with Python, Flask, security rules and a small
-                machine-learning model.
+                PhishGuard is a defensive B.Tech Computer Science
+                project designed to demonstrate practical
+                phishing-risk analysis using Python, Flask,
+                machine learning and security-based detection rules.
             </p>
 
-            <h2>What it does</h2>
+            <h2>
+                What it does
+            </h2>
+
             <p>
-                Registered users can inspect URLs, pasted email text and QR
-                images for warning indicators. The application presents an
-                educational risk estimate and explains the signals it found.
-                It does not visit a submitted website or claim to replace a
-                browser, antivirus product or professional security review.
+                Visitors can analyze suspicious URLs, email content
+                and QR-code images for warning indicators. The
+                platform provides educational risk estimates,
+                detected signals and practical recommendations.
             </p>
 
-            <h2>Open implementation</h2>
             <p>
-                The project source is publicly available for review on
-                <a 
-                   rel="external noreferrer">GitHub</a>.
+                Password Security and the AI Assistant can also be
+                used without creating an account. Accounts are
+                optional and provide additional features such as
+                personal scan history and dashboard analytics.
             </p>
+
+            <h2>
+                Project Scope
+            </h2>
+
+            <p>
+                PhishGuard is designed as a defensive decision-support
+                and cybersecurity-awareness platform. Its results
+                should be treated as guidance rather than a guarantee
+                that submitted content is completely safe or malicious.
+            </p>
+
         </div>
+
     </div>
+
 </section>
+
 {% endblock %}

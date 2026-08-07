@@ -1981,3 +1981,74 @@ button:disabled {
     }
 }
 
+/* Container positioning and layout */
+.notice-banner {
+  width: 100%;
+  max-width: 960px; /* Aligns with standard content wrappers */
+  margin: 1.5rem auto; /* Centers the banner vertically and horizontally */
+  padding: 0.85rem 1.25rem;
+  
+  /* Modern translucent theme matching a dark/tech aesthetic */
+  background: rgba(30, 41, 59, 0.6); 
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-left: 4px solid #38bdf8; /* Vibrant accent border on the left */
+  border-radius: 8px;
+  
+  /* Subtle glassmorphism backdrop */
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  
+  transition: all 0.3s ease;
+}
+
+/* Hover effect for interactive visual feedback */
+.notice-banner:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 6px 16px rgba(56, 189, 248, 0.1);
+}
+
+/* Flexbox alignment for icon and text */
+.notice-content {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+/* Icon styling */
+.notice-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #38bdf8; /* Accent color */
+  flex-shrink: 0;
+}
+
+/* Typography styling */
+.notice-text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #e2e8f0; /* Soft readable text color */
+}
+
+.notice-text strong {
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+/* Responsive adjustment for small screens */
+@media (max-width: 640px) {
+  .notice-banner {
+    margin: 1rem;
+    width: calc(100% - 2rem);
+    padding: 0.75rem 1rem;
+  }
+  
+  .notice-content {
+    align-items: flex-start;
+  }
+
+  .notice-icon {
+    margin-top: 0.15rem;
+  }
+}

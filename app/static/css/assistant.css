@@ -344,3 +344,154 @@
     margin-bottom: 0;
 }
 
+/* ========================================
+   AI MESSAGE BODY
+======================================== */
+
+.message-content .message-body {
+    padding: 12px 15px;
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    overflow-wrap: anywhere;
+}
+
+.assistant-message .message-body {
+    background: rgba(214, 168, 95, 0.04);
+}
+
+.user-message .message-body {
+    background: rgba(169, 186, 199, 0.05);
+}
+
+
+/* Remove old paragraph bubble styling inside message body */
+
+.message-content .message-body p {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+
+    white-space: normal;
+}
+
+
+/* Preserve user's typed line breaks */
+
+.user-message .message-body p {
+    white-space: pre-wrap;
+}
+
+
+/* Assistant paragraphs */
+
+.assistant-message .message-body p {
+    margin: 0 0 12px;
+    line-height: 1.7;
+}
+
+
+/* Assistant headings */
+
+.assistant-message .message-body h1 {
+    margin: 0 0 14px;
+
+    font-size: 1.3rem;
+    line-height: 1.35;
+}
+
+.assistant-message .message-body h2 {
+    margin: 20px 0 9px;
+
+    font-size: 1.08rem;
+    line-height: 1.4;
+}
+
+.assistant-message .message-body h3 {
+    margin: 18px 0 8px;
+
+    font-size: 0.98rem;
+    line-height: 1.4;
+}
+
+
+/* Lists */
+
+.assistant-message .message-body ul,
+.assistant-message .message-body ol {
+    margin: 8px 0 14px;
+    padding-left: 24px;
+}
+
+.assistant-message .message-body li {
+    margin: 5px 0;
+    line-height: 1.65;
+}
+
+
+/* Blockquotes */
+
+.assistant-message .message-body blockquote {
+    margin: 12px 0;
+    padding: 8px 14px;
+
+    border-left: 3px solid #d6a85f;
+
+    color: var(--muted);
+}
+
+
+/* Code blocks */
+
+.assistant-message .message-body pre {
+    margin: 12px 0 16px;
+    padding: 14px;
+
+    overflow-x: auto;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: rgba(0, 0, 0, 0.28);
+}
+
+.assistant-message .message-body pre code {
+    padding: 0;
+    background: transparent;
+
+    white-space: pre;
+}
+
+
+/* Inline code */
+
+.assistant-message .message-body code {
+    padding: 2px 5px;
+
+    border-radius: 5px;
+
+    background: rgba(255, 255, 255, 0.07);
+
+    font-family:
+        "Consolas",
+        "Courier New",
+        monospace;
+
+    font-size: 0.88em;
+}
+
+
+/* Bold text */
+
+.assistant-message .message-body strong {
+    font-weight: 700;
+}
+
+
+/* Final element */
+
+.assistant-message .message-body > *:last-child {
+    margin-bottom: 0;
+}

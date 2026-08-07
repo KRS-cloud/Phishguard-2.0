@@ -180,6 +180,13 @@ class Config:
         else "http"
     )
 
+    REVIEW_MODE = (
+        get_boolean_environment_value(
+            "REVIEW_MODE",
+            False,
+        )
+    )
+
     TRUST_PROXY = (
         get_boolean_environment_value(
             "TRUST_PROXY",
